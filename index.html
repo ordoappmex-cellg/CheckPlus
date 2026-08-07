@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Umbral · Equipo v60</title>
+<title>Umbral · Equipo v63</title>
 <meta name="theme-color" content="#0F0A1E">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1011,7 +1011,7 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
 <body>
 
 <div id="cp-splash">
-  <div id="cp-splash-logo"><img src="assets/logo.png" alt="Umbral"></div>
+  <div id="cp-splash-logo"><img src="assets/logo.png" alt="Logo"></div>
   <div id="cp-splash-dots"><span></span><span></span><span></span></div>
 </div>
 
@@ -5663,6 +5663,7 @@ function _gpPaintEfemerideBanner(){
 
 function renderDashSectionCalendario(el){
   const SC='background:white;border-radius:16px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.07)';
+  const VBTN='padding:5px 12px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font-body);background:transparent;color:var(--cp-gray-600)';
   el.innerHTML=
     '<div style="'+SC+';margin-bottom:20px">'+
       '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--cp-gray-100)">'+
@@ -5672,6 +5673,10 @@ function renderDashSectionCalendario(el){
           '<span id="ucal-title" style="font-weight:600;font-size:13px;color:var(--cp-navy);min-width:140px;text-align:center"></span>'+
           '<button class="btn-sm btn-ghost" onclick="ucalNav(1)"><i class="ti ti-chevron-right"></i></button>'+
           '<button class="btn-sm btn-ghost" onclick="ucalNav(0)">Hoy</button>'+
+          '<div style="display:flex;gap:2px;background:var(--cp-gray-100);border-radius:7px;padding:2px;margin-left:6px">'+
+            '<button type="button" id="ucal-view-btn-mes" onclick="ucalSetView(\'mes\')" style="'+VBTN+'">Mes</button>'+
+            '<button type="button" id="ucal-view-btn-lista" onclick="ucalSetView(\'lista\')" style="'+VBTN+'">Lista</button>'+
+          '</div>'+
         '</div>'+
       '</div>'+
       '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">'+
@@ -5682,13 +5687,15 @@ function renderDashSectionCalendario(el){
         '<button class="dev-filter-chip" onclick="ucalFilter(\'desarrollos\',this)"><i class="ti ti-code" style="font-size:10px"></i> Desarrollos</button>'+
         '<button class="dev-filter-chip" onclick="ucalFilter(\'facturas\',this)"><i class="ti ti-file-invoice" style="font-size:10px"></i> Facturas</button>'+
         '<button class="dev-filter-chip" onclick="ucalFilter(\'marketing\',this)"><i class="ti ti-speakerphone" style="font-size:10px"></i> Marketing</button>'+
+        '<button class="dev-filter-chip" onclick="ucalFilter(\'gp\',this)"><i class="ti ti-checklist" style="font-size:10px"></i> Gestión de Proyectos (mis tareas)</button>'+
       '</div>'+
-      '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:6px">'+
+      '<div id="ucal-weekday-header" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:6px">'+
         ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(d=>'<div style="text-align:center;font-size:10px;font-weight:600;color:var(--cp-gray-400);padding:4px 0">'+d+'</div>').join('')+
       '</div>'+
       '<div id="ucal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px"></div>'+
+      '<div id="ucal-list" style="display:none;max-height:420px;overflow-y:auto"></div>'+
       '<div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:10px;color:var(--cp-gray-500)">'+
-        [['#7B2FF7','Kanban'],['#3B6BF5','Seguimientos'],['#10C080','Vacaciones'],['#F59E0B','Desarrollos'],['#EF4444','Facturas venc.'],['#EC4899','Marketing']].map(([c,l])=>
+        [['#7B2FF7','Kanban'],['#3B6BF5','Seguimientos'],['#10C080','Vacaciones'],['#F59E0B','Desarrollos'],['#EF4444','Facturas venc.'],['#EC4899','Marketing'],['#06B6D4','Gestión de Proyectos (mis tareas)']].map(([c,l])=>
           '<span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:'+c+';flex-shrink:0"></span>'+l+'</span>'
         ).join('')+
       '</div>'+
@@ -5698,13 +5705,15 @@ function renderDashSectionCalendario(el){
       '<div class="bday-calendar" id="dash-bday-cal"></div>'+
     '</div>';
   renderBdayCal();
-  renderUnifiedCalendar();
-  // Kanban/Desarrollos/Marketing events are lazily loaded — hydrate the
+  ucalSetView(ucalView);
+  // Kanban/Desarrollos/Marketing/GP events are lazily loaded — hydrate the
   // calendar with those event dots once they arrive (progressive enhancement,
-  // doesn't block the initial paint of seguimientos/vacaciones/facturas).
-  if(!_moduleLoaded['kanban']||!_moduleLoaded['desarrollos']||!_moduleLoaded['marketing']){
-    Promise.all([loadModuleData('kanban'),loadModuleData('desarrollos'),loadModuleData('marketing')])
-      .then(()=>{ if(document.getElementById('ucal-grid')) renderUnifiedCalendar(); });
+  // doesn't block the initial paint of seguimientos/vacaciones/facturas). GP
+  // specifically needs gp_tareas/gp_proyectos in memory before
+  // getMisPendientesSync() (called from getAllCalendarEvents) can see them.
+  if(!_moduleLoaded['kanban']||!_moduleLoaded['desarrollos']||!_moduleLoaded['marketing']||!_moduleLoaded['gestion-proyectos']){
+    Promise.all([loadModuleData('kanban'),loadModuleData('desarrollos'),loadModuleData('marketing'),loadModuleData('gestion-proyectos')])
+      .then(()=>{ if(document.getElementById('ucal-grid')) ucalRerenderCurrentView(); });
   }
 }
 
@@ -7543,6 +7552,15 @@ function misPendIsVencida(item){
   if(!item.fecha)return false;
   const hoy=new Date();hoy.setHours(0,0,0,0);
   return new Date(item.fecha+'T12:00:00')<hoy;
+}
+// Mismo patrón hoy/tmrw usado en getAllNotifications() — aquí como helper
+// reutilizable para la campana (v62), no existía antes.
+function misPendIsHoyOManana(item){
+  if(!item.fecha)return false;
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const tmrw=new Date(hoy);tmrw.setDate(tmrw.getDate()+1);
+  const d=new Date(item.fecha+'T12:00:00');
+  return d.getTime()===hoy.getTime()||d.getTime()===tmrw.getTime();
 }
 // Vencidas primero, luego fecha ascendente, sin fecha al final.
 function misPendSort(items){
@@ -10636,10 +10654,11 @@ function exportProyReport(){
 let ucalYear = new Date().getFullYear();
 let ucalMonth = new Date().getMonth();
 let ucalActiveFilter = 'all';
+let ucalView = 'mes'; // 'mes' | 'lista'
 
 const UCAL_COLORS = {
   kanban: '#7B2FF7', seguimientos: '#3B6BF5', vacaciones: '#10C080',
-  desarrollos: '#F59E0B', facturas: '#EF4444', marketing: '#EC4899'
+  desarrollos: '#F59E0B', facturas: '#EF4444', marketing: '#EC4899', gp: '#06B6D4'
 };
 
 function ucalNav(dir) {
@@ -10652,16 +10671,46 @@ function ucalFilter(type, btn) {
   ucalActiveFilter = type;
   document.querySelectorAll('#view-dashboard .dev-filter-chip').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
-  renderUnifiedCalendar();
+  ucalRerenderCurrentView();
+}
+
+// Mes/Lista toggle — ambas vistas comparten getAllCalendarEvents() (un solo
+// data path, ver Lista abajo). CRÍTICO: al volver a Mes hay que restaurar
+// display:grid explícitamente en el header de días de semana Y en el grid —
+// dejarlos solo en "no display:none" no basta, colapsan a columna vertical.
+function ucalRerenderCurrentView(){
+  if(ucalView==='lista') renderUnifiedCalendarList();
+  else renderUnifiedCalendar();
+}
+function ucalSetView(view){
+  ucalView = view;
+  const isMes = view==='mes';
+  const btnMes=document.getElementById('ucal-view-btn-mes');
+  const btnLista=document.getElementById('ucal-view-btn-lista');
+  if(btnMes){btnMes.style.background=isMes?'var(--cp-purple)':'transparent';btnMes.style.color=isMes?'white':'var(--cp-gray-600)';}
+  if(btnLista){btnLista.style.background=!isMes?'var(--cp-purple)':'transparent';btnLista.style.color=!isMes?'white':'var(--cp-gray-600)';}
+  const weekdayHeader=document.getElementById('ucal-weekday-header');
+  const grid=document.getElementById('ucal-grid');
+  const list=document.getElementById('ucal-list');
+  if(isMes){
+    if(weekdayHeader)weekdayHeader.style.display='grid';
+    if(grid)grid.style.display='grid';
+    if(list)list.style.display='none';
+  } else {
+    if(weekdayHeader)weekdayHeader.style.display='none';
+    if(grid)grid.style.display='none';
+    if(list)list.style.display='block';
+  }
+  ucalRerenderCurrentView();
 }
 
 function getAllCalendarEvents() {
   const events = {};
-  const addEvent = (dateStr, label, type, color) => {
+  const addEvent = (dateStr, label, type, color, id) => {
     if(!dateStr) return;
     const key = dateStr.slice(0,10);
     if(!events[key]) events[key] = [];
-    events[key].push({label, type, color});
+    events[key].push({label, type, color, id: id||null});
   };
 
   const f = ucalActiveFilter;
@@ -10722,6 +10771,16 @@ function getAllCalendarEvents() {
     });
   }
 
+  // GESTIÓN DE PROYECTOS — mis subtareas asignadas/solicitadas (getMisPendientesSync
+  // ya filtra por usuario, sin bypass de admin). GP es intencionalmente el único
+  // source privado — los otros 6 de arriba son org-wide. NO lo "arregles" a org-wide.
+  if(f==='all'||f==='gp') {
+    getMisPendientesSync().filter(i=>i.origen==='gp').forEach(item=>{
+      if(!item.fecha) return;
+      addEvent(item.fecha, '📋 '+item.titulo.slice(0,20), 'gp', UCAL_COLORS.gp, item.id);
+    });
+  }
+
   return events;
 }
 
@@ -10767,6 +10826,53 @@ function renderUnifiedCalendar() {
   grid.innerHTML = html;
 }
 
+// Vista Lista — reusa getAllCalendarEvents() (mismo data path que Mes, respeta
+// ucalActiveFilter incluido el source privado 'gp'), aplanada y ordenada por
+// fecha ascendente desde hoy, ~60 días hacia adelante. Independiente de
+// ucalMonth/ucalYear (no está atada a la navegación de mes).
+const UCAL_LIST_LABELS = {
+  kanban:'Kanban', seguimientos:'Seguimientos', vacaciones:'Vacaciones',
+  desarrollos:'Desarrollos', facturas:'Facturas', marketing:'Marketing',
+  gp:'Gestión de Proyectos (mis tareas)'
+};
+function renderUnifiedCalendarList() {
+  const list = document.getElementById('ucal-list');
+  if(!list) return;
+
+  const titleEl = document.getElementById('ucal-title');
+  if(titleEl) titleEl.textContent = 'Próximos 60 días';
+
+  const events = getAllCalendarEvents();
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const rows = [];
+  Object.keys(events).sort().forEach(dateStr=>{
+    const d = new Date(dateStr+'T12:00:00');
+    const daysOut = Math.round((d-hoy)/86400000);
+    if(daysOut<0 || daysOut>60) return;
+    events[dateStr].forEach(ev=>rows.push(Object.assign({dateStr}, ev)));
+  });
+
+  if(!rows.length){
+    list.innerHTML='<div class="empty-state" style="padding:30px"><i class="ti ti-calendar-off" style="font-size:32px"></i><p>Sin actividades en los próximos 60 días.</p></div>';
+    return;
+  }
+
+  list.innerHTML = rows.map((ev,i)=>{
+    const clickable = ev.type==='gp' && ev.id;
+    const rowStyle='display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--cp-gray-100)'+(clickable?';cursor:pointer':'');
+    return '<div'+(clickable?' data-ucal-list-idx="'+i+'"':'')+' style="'+rowStyle+'">'+
+      '<div style="font-size:11px;color:var(--cp-gray-500);min-width:76px;flex-shrink:0">'+fmtDateShort(ev.dateStr)+'</div>'+
+      '<span style="width:8px;height:8px;border-radius:50%;background:'+ev.color+';flex-shrink:0"></span>'+
+      '<div style="flex:1;font-size:12px;color:var(--cp-navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+ev.label+'</div>'+
+      '<div style="font-size:10px;color:var(--cp-gray-400);flex-shrink:0">'+(UCAL_LIST_LABELS[ev.type]||ev.type)+'</div>'+
+    '</div>';
+  }).join('');
+
+  list.querySelectorAll('[data-ucal-list-idx]').forEach(elRow=>{
+    const i=parseInt(elRow.dataset.ucalListIdx,10);
+    elRow.addEventListener('click', ()=>{ if(rows[i].id) navToTask(rows[i].id); });
+  });
+}
 
 // ─── DAY EXPAND (all calendars) ──────────────────
 function openDayDetail(dateStr) {
@@ -10827,6 +10933,13 @@ function openDayDetail(dateStr) {
       const tipo=p.tipo==='pendiente'?'📌 Pendiente':'📦 Proyecto';
       events.push({icon:'ti-briefcase',color:'#EC4899',tipo:tipo,title:p.nombre,sub:'Entrega',action:()=>{closeModal('modal-day-detail');nav('marketing');setTimeout(()=>switchMktTab('proyectos'),300);}});
     }
+  });
+
+  // Gestión de Proyectos — igual que el resto de este builder (independiente
+  // de getAllCalendarEvents, no filtrado por ucalActiveFilter), pero la fuente
+  // en sí SIGUE siendo privada: getMisPendientesSync() ya trae solo mis tareas.
+  getMisPendientesSync().filter(i=>i.origen==='gp'&&i.fecha===dateStr).forEach(item=>{
+    events.push({icon:'ti-checklist',color:UCAL_COLORS.gp,tipo:'Gestión de Proyectos',title:item.titulo,sub:item.padre,action:()=>{closeModal('modal-day-detail');navToTask(item.id);}});
   });
 
   if(!events.length){
@@ -12307,25 +12420,31 @@ function renderNotifContent(target) {
     badge.style.display = total > 0 ? 'flex' : 'none';
   }
 
-  const s = notifs.summary;
+  // Resumen personal (v62) — reemplaza los 4 tiles org-wide (Equipo activo/
+  // Kanban/Devs/Facturas) por 3 tiles de getMisPendientesSync(), que no tiene
+  // bypass de admin: estos 3 tiles son personales para TODOS los roles,
+  // incluido admin. Las secciones de abajo (buildNotifSection: vencidas/hoy/
+  // mañana/semana, vía getAllNotifications) NO se tocan y conservan su propio
+  // bypass de admin — es decir, la campana queda personal arriba y org-wide-
+  // para-admin abajo; solo se portó el Resumen semanal, a propósito.
+  const misPend = getMisPendientesSync(state.currentUser?.id);
+  const misOverdue = misPend.filter(misPendIsVencida).length;
+  const misHoyMan = misPend.filter(i=>!misPendIsVencida(i) && misPendIsHoyOManana(i)).length;
+  const misActivas = misPend.length;
   const summaryHTML = '<div style="padding:12px 16px;background:var(--cp-gray-50);border-bottom:1px solid var(--cp-gray-100)">' +
-    '<div style="font-size:11px;font-weight:600;color:var(--cp-gray-400);text-transform:uppercase;margin-bottom:8px">Resumen semanal</div>' +
-    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">' +
+    '<div style="font-size:11px;font-weight:600;color:var(--cp-gray-400);text-transform:uppercase;margin-bottom:8px">Requiere mi atención</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">' +
       '<div style="text-align:center;padding:8px;background:white;border-radius:var(--radius-sm);border:1px solid var(--cp-gray-200)">' +
-        '<div style="font-size:18px;font-weight:700;font-family:var(--font-display);color:var(--cp-navy)">'+s.teamSize+'</div>' +
-        '<div style="font-size:10px;color:var(--cp-gray-400)">Equipo activo</div>' +
+        '<div style="font-size:18px;font-weight:700;font-family:var(--font-display);color:'+(misOverdue>0?'var(--cp-red)':'var(--cp-green)')+'">'+misOverdue+'</div>' +
+        '<div style="font-size:10px;color:var(--cp-gray-400)">Mis vencidas</div>' +
       '</div>' +
       '<div style="text-align:center;padding:8px;background:white;border-radius:var(--radius-sm);border:1px solid var(--cp-gray-200)">' +
-        '<div style="font-size:18px;font-weight:700;font-family:var(--font-display);color:'+(s.overdueKb>0?'var(--cp-red)':'var(--cp-green)')+'">'+s.totalKb+'</div>' +
-        '<div style="font-size:10px;color:var(--cp-gray-400)">Tareas Kanban'+(s.overdueKb>0?' ('+s.overdueKb+' vencidas)':'')+'</div>' +
+        '<div style="font-size:18px;font-weight:700;font-family:var(--font-display);color:'+(misHoyMan>0?'var(--cp-amber)':'var(--cp-navy)')+'">'+misHoyMan+'</div>' +
+        '<div style="font-size:10px;color:var(--cp-gray-400)">Para hoy y mañana</div>' +
       '</div>' +
       '<div style="text-align:center;padding:8px;background:white;border-radius:var(--radius-sm);border:1px solid var(--cp-gray-200)">' +
-        '<div style="font-size:18px;font-weight:700;font-family:var(--font-display);color:var(--cp-blue)">'+s.activeDevs+'</div>' +
-        '<div style="font-size:10px;color:var(--cp-gray-400)">Devs en curso</div>' +
-      '</div>' +
-      '<div style="text-align:center;padding:8px;background:white;border-radius:var(--radius-sm);border:1px solid var(--cp-gray-200)">' +
-        '<div style="font-size:18px;font-weight:700;font-family:var(--font-display);color:'+(s.pendFact>0?'var(--cp-amber)':'var(--cp-green)')+'">'+s.pendFact+'</div>' +
-        '<div style="font-size:10px;color:var(--cp-gray-400)">Facturas pendientes</div>' +
+        '<div style="font-size:18px;font-weight:700;font-family:var(--font-display);color:var(--cp-navy)">'+misActivas+'</div>' +
+        '<div style="font-size:10px;color:var(--cp-gray-400)">Activas ahora</div>' +
       '</div>' +
     '</div>' +
   '</div>';
