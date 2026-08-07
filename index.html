@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Umbral · Equipo v63</title>
+<title>Umbral</title>
 <meta name="theme-color" content="#0F0A1E">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1093,8 +1093,8 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
                 <i class="ti ti-sparkles" style="color:white;font-size:15px"></i>
               </div>
               <div style="flex:1">
-                <div style="font-weight:700;font-size:13px;color:white">Asistente IA Umbral</div>
-                <div style="font-size:10px;color:rgba(255,255,255,.45)" id="ai-panel-status">Powered by Groq · Llama 3</div>
+                <div id="ai-panel-title" style="font-weight:700;font-size:13px;color:white">Asistente IA</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.45)" id="ai-panel-status">Asistente inteligente</div>
               </div>
               <div style="display:flex;gap:6px">
                 <button onclick="openAIConfig()" title="Configuración IA" style="background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.6);width:28px;height:28px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center"><i class="ti ti-settings"></i></button>
@@ -1114,8 +1114,8 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
             <div id="ai-chat-messages" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--cp-gray-50)">
               <div style="display:flex;gap:8px;align-items:flex-start">
                 <div style="width:24px;height:24px;border-radius:50%;background:var(--cp-purple);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-sparkles" style="color:white;font-size:11px"></i></div>
-                <div class="ai-bubble-content" style="background:white;border:1px solid var(--cp-gray-200);border-radius:0 var(--radius-md) var(--radius-md) var(--radius-md);padding:10px 13px;font-size:12px;color:var(--cp-gray-800);line-height:1.6;max-width:90%">
-                  ¡Hola! Tengo acceso a todos los datos de Umbral. Pregúntame sobre tu equipo, proyectos, facturas o cualquier cosa. ¿En qué te ayudo?
+                <div id="ai-initial-greeting-topbar" class="ai-bubble-content" style="background:white;border:1px solid var(--cp-gray-200);border-radius:0 var(--radius-md) var(--radius-md) var(--radius-md);padding:10px 13px;font-size:12px;color:var(--cp-gray-800);line-height:1.6;max-width:90%">
+                  ¡Hola! Tengo acceso a los datos de tu equipo. Pregúntame sobre tu equipo, proyectos, facturas o cualquier cosa. ¿En qué te ayudo?
                 </div>
               </div>
             </div>
@@ -2282,8 +2282,8 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
                 <i class="ti ti-sparkles" style="color:white;font-size:18px"></i>
               </div>
               <div>
-                <div style="font-family:var(--font-display);font-weight:700;font-size:15px;color:white">Asistente IA Umbral</div>
-                <div style="font-size:11px;color:rgba(255,255,255,.5)">Powered by Groq (Llama 3) · Acceso a todos los datos</div>
+                <div id="ai-view-title" style="font-family:var(--font-display);font-weight:700;font-size:15px;color:white">Asistente IA</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.5)">Asistente inteligente</div>
               </div>
               <div style="margin-left:auto;display:flex;gap:8px">
                 <button onclick="clearAIChat()" style="background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);padding:5px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px"><i class="ti ti-trash"></i> Limpiar</button>
@@ -2291,12 +2291,12 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
               </div>
             </div>
             <!-- Messages -->
-            <div id="ai-chat-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--cp-gray-50)">
+            <div id="ai-chat-messages-view" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--cp-gray-50)">
               <div class="ai-msg-assistant">
                 <div style="display:flex;gap:10px;align-items:flex-start">
                   <div style="width:28px;height:28px;border-radius:50%;background:var(--cp-purple);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-sparkles" style="color:white;font-size:13px"></i></div>
-                  <div id="ai-initial-greeting" style="background:white;border:1px solid var(--cp-gray-200);border-radius:0 var(--radius-md) var(--radius-md) var(--radius-md);padding:10px 14px;max-width:85%;font-size:13px;color:var(--cp-gray-800);line-height:1.6">
-                    ¡Hola! Tengo acceso a todos los datos de Umbral. ¿En qué te ayudo?
+                  <div id="ai-initial-greeting-view" style="background:white;border:1px solid var(--cp-gray-200);border-radius:0 var(--radius-md) var(--radius-md) var(--radius-md);padding:10px 14px;max-width:85%;font-size:13px;color:var(--cp-gray-800);line-height:1.6">
+                    ¡Hola! Tengo acceso a los datos de tu equipo. ¿En qué te ayudo?
                   </div>
                 </div>
               </div>
@@ -2311,11 +2311,11 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
             </div>
             <!-- Input -->
             <div style="padding:12px 16px;border-top:1px solid var(--cp-gray-100);background:white;display:flex;gap:10px">
-              <textarea id="ai-chat-input" placeholder="Pregunta algo sobre tu equipo, proyectos, clientes…" style="flex:1;border:1.5px solid var(--cp-gray-200);border-radius:var(--radius-md);padding:10px 14px;font-size:13px;font-family:var(--font-body);resize:none;min-height:44px;max-height:120px;outline:none;transition:border .15s" rows="1"
+              <textarea id="ai-chat-input-view" placeholder="Pregunta algo sobre tu equipo, proyectos, clientes…" style="flex:1;border:1.5px solid var(--cp-gray-200);border-radius:var(--radius-md);padding:10px 14px;font-size:13px;font-family:var(--font-body);resize:none;min-height:44px;max-height:120px;outline:none;transition:border .15s" rows="1"
                 onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAIMessage();}"
                 oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"
                 onfocus="this.style.borderColor='var(--cp-purple)'" onblur="this.style.borderColor='var(--cp-gray-200)'"></textarea>
-              <button onclick="sendAIMessage()" id="ai-send-btn" style="width:44px;height:44px;border-radius:var(--radius-md);background:var(--cp-purple);border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s">
+              <button onclick="sendAIMessage()" id="ai-send-btn-view" style="width:44px;height:44px;border-radius:var(--radius-md);background:var(--cp-purple);border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s">
                 <i class="ti ti-send" style="font-size:18px"></i>
               </button>
             </div>
@@ -4882,6 +4882,9 @@ const SUPABASE_URL='https://pwuvecyqhfxegirtmmjy.supabase.co';
 const SUPABASE_KEY='sb_publishable_7zCWzCHx4TqENab3K05zQg_qVwf3D7k';
 // NOTE: Service key removed from client code for security.
 // All DB access goes through the authenticated user session (RLS enforced).
+// Single source of truth for the build version — feeds the discreet sidebar
+// version label (future feature); not shown in the window title anymore.
+const APP_VERSION='v64';
 let sb;
 try {
   // Supabase JS v2: createClient with persistSession:true automatically
@@ -5371,7 +5374,7 @@ async function nav(view){
     await loadModuleData('organigrama');
     renderOrganigrama();
   }
-  if(view==='ai-chat'){renderAIContextPanel();updateAIRecentPrompts();document.getElementById('page-title').textContent='Asistente IA';}
+  if(view==='ai-chat'){aiRenderGreeting('view');renderAIContextPanel();updateAIRecentPrompts();document.getElementById('page-title').textContent='Asistente IA';}
   if(view==='repositorio'){
     document.getElementById('page-title').textContent='Repositorio de documentos';
     if(!_moduleLoaded['repositorio'])showModuleSkeleton('repo-docs-grid');
@@ -7137,7 +7140,7 @@ window.addEventListener('beforeinstallprompt', e => {
       const btn = document.createElement('button');
       btn.id = 'pwa-install-btn';
       btn.className = 'btn-sm btn-ghost';
-      btn.title = 'Instalar Umbral como app';
+      btn.title = 'Instalar '+(companyInfo?.nombre||'la app')+' como app';
       btn.innerHTML = '<i class="ti ti-device-mobile-down"></i>';
       btn.style.cssText = 'color:var(--cp-purple);border-color:var(--cp-purple)';
       btn.onclick = async () => {
@@ -7146,7 +7149,7 @@ window.addEventListener('beforeinstallprompt', e => {
         const { outcome } = await _pwaInstallPrompt.userChoice;
         if(outcome === 'accepted') {
           btn.remove();
-          toast('Umbral instalada ✓');
+          toast((companyInfo?.nombre||'La app')+' instalada ✓');
         }
         _pwaInstallPrompt = null;
       };
@@ -7158,7 +7161,7 @@ window.addEventListener('beforeinstallprompt', e => {
 window.addEventListener('appinstalled', () => {
   document.getElementById('pwa-install-btn')?.remove();
   _pwaInstallPrompt = null;
-  toast('Umbral instalada como app ✓');
+  toast((companyInfo?.nombre||'La app')+' instalada como app ✓');
 });
 
 // ── SUPABASE REALTIME ────────────────────────────
@@ -11290,11 +11293,11 @@ let aiRecentPrompts = [];
 
 function promptGeminiKey(){
   if(state.currentUser?.role!=='admin'){ toast('Solo un administrador puede configurar la key','error'); return; }
-  const key = prompt('Ingresa la API key de Groq del equipo (console.groq.com):');
+  const key = prompt('Ingresa la API key del asistente IA del equipo:');
   if(!key||!key.trim()) return;
   GEMINI_API_KEY = key.trim();
   saveAiKeyToSB(GEMINI_API_KEY);
-  toast('API key de Groq guardada ✓');
+  toast('API key del asistente guardada ✓');
   if(document.getElementById('view-ai-chat')?.classList.contains('active')) renderAIContextPanel();
   refreshDashAI();
 }
@@ -11398,6 +11401,37 @@ async function buildAppContext(){
   const _spActivosCtx = spActivos.map(s=>`• ${s.folio} [${_spTipoLabel(s.tipoId)}] ${s.titulo} | Cliente: ${s.clienteNombre} | Técnico: ${_spTecNombre(s)} | Apps: ${_spApps(s)} | Estado: ${_spEstadoLabel(s.estadoId)} | Prio: ${s.prio||'—'} | Horas: ${s.horasInvertidas||0}h | Inicio: ${s.fechaInicio||'—'}`).join('\n')||'Sin registros activos';
   const _spCerradosCtx = spCerrados.map(s=>`• ${s.folio} [${_spTipoLabel(s.tipoId)}] ${s.titulo} | Cliente: ${s.clienteNombre} | Técnico: ${_spTecNombre(s)} | Cierre: ${s.fechaCierre?s.fechaCierre.slice(0,10):'—'} | Horas: ${s.horasInvertidas||0}h | Solución: ${s.solucion||'—'}`).join('\n')||'Sin historial cerrado';
 
+  // GESTIÓN DE PROYECTOS — diagnóstico global, admin-only. Agregados únicamente
+  // (conteos/promedios), nunca filas crudas más allá de la lista acotada de
+  // vencidas — el detalle por-usuario ya vive en buildMisPendContext() arriba,
+  // este bloque no lo duplica ni cambia su alcance/privacidad.
+  const gpProyAbiertos = gpProyectos.filter(p=>p.estado!=='cerrado').length;
+  const gpProyCerrados = gpProyectos.filter(p=>p.estado==='cerrado').length;
+  const gpTareasAbiertas = gpTareas.filter(t=>t.estado!=='completada');
+  const gpTareasCompletadas = gpTareas.filter(t=>t.estado==='completada');
+  const gpTareasVencidas = gpTareasAbiertas.filter(t=>t.fechaEntrega&&new Date(t.fechaEntrega+'T12:00:00')<hoy);
+  const gpPorTipo = (gpConfig.tipos_tarea||[]).map(tt=>{
+    const abiertas = gpTareasAbiertas.filter(t=>t.tipoTarea===tt.id).length;
+    const completadasTipo = gpTareasCompletadas.filter(t=>t.tipoTarea===tt.id&&t.createdAt&&t.fechaCompletada);
+    const avgDias = completadasTipo.length ? (completadasTipo.reduce((s,t)=>s+(new Date(t.fechaCompletada)-new Date(t.createdAt))/86400000,0)/completadasTipo.length).toFixed(1) : null;
+    return (abiertas||completadasTipo.length) ? `${tt.nombre}: ${abiertas} abiertas, ${completadasTipo.length} completadas${avgDias?` (${avgDias}d prom.)`:''}` : null;
+  }).filter(Boolean).join(' | ')||'Sin datos';
+  const gpPorAsignado = {};
+  gpTareasAbiertas.forEach(t=>{
+    (t.asignados||[]).forEach(a=>{
+      const emp = state.employees.find(e=>e.id===a.id);
+      const key = emp ? emp.nombre+' '+emp.apellidos : (a.nombre||'Sin asignar');
+      if(!gpPorAsignado[key]) gpPorAsignado[key]={total:0,vencidas:0};
+      gpPorAsignado[key].total++;
+      if(t.fechaEntrega&&new Date(t.fechaEntrega+'T12:00:00')<hoy) gpPorAsignado[key].vencidas++;
+    });
+  });
+  const gpPorAsignadoTxt = Object.entries(gpPorAsignado).slice(0,8).map(([k,v])=>`${k}: ${v.total} abiertas (${v.vencidas} vencidas)`).join(' | ')||'Sin asignaciones';
+  const gpTopVencidas = gpTareasVencidas.slice().sort((a,b)=>new Date(a.fechaEntrega)-new Date(b.fechaEntrega)).slice(0,8).map(t=>{
+    const proy = gpProyectos.find(p=>p.id===t.proyectoId);
+    return `• ${t.titulo} [${proy?proy.titulo:'—'}] vence ${t.fechaEntrega}`;
+  }).join('\n')||'Ninguna';
+
   return pendBlock + `Eres el asistente IA de ${companyInfo.nombre}, ${companyInfo.descripcion}${companyInfo.ciudad ? ' basada en '+companyInfo.ciudad : ''}. Tienes acceso completo a los datos en tiempo real. Responde siempre en español, de forma concisa y accionable.
 
 === EQUIPO (${state.employees.filter(e=>e.estado==='activo').length} activos) ===
@@ -11418,6 +11452,14 @@ ${pendFact.slice(0,8).join('\n')}
 === MARKETING ===
 CAMPAÑAS ACTIVAS (${activeCamps.length}): ${activeCamps.join(' | ')}
 PROYECTOS: ${mktProyData.filter(p=>p.stage==='activo').length} activos, ${mktProyData.filter(p=>p.stage==='completado').length} completados
+
+=== GESTIÓN DE PROYECTOS (diagnóstico global) ===
+Proyectos: ${gpProyAbiertos} abiertos, ${gpProyCerrados} cerrados
+Tareas: ${gpTareasAbiertas.length} abiertas, ${gpTareasCompletadas.length} completadas, ${gpTareasVencidas.length} vencidas
+Por tipo: ${gpPorTipo}
+Por persona (abiertas/vencidas): ${gpPorAsignadoTxt}
+MÁS VENCIDAS:
+${gpTopVencidas}
 
 === PRÓXIMOS EVENTOS ===
 VACACIONES PROGRAMADAS: ${vacs.slice(0,5).join(' | ')||'Ninguna'}
@@ -11468,33 +11510,71 @@ POR PERSONA:
 ${Object.entries(disenoByPerson).map(([p,d])=>`• ${p}: ${d.total} tareas\n  ${d.tasks.slice(0,3).join(', ')}${d.tasks.length>3?` +${d.tasks.length-3} más`:''}`).join('\n')||'Sin tareas activas'}`;
 }
 
-// ── SEND MESSAGE ─────────────────────────────────
-async function sendAIMessage(){
-  const input = document.getElementById('ai-chat-input');
-  const msg = input?.value.trim();
-  if(!msg) return;
-  input.value='';input.style.height='44px';
-  await sendAIPrompt(msg);
+// ── SURFACE RESOLUTION ───────────────────────────
+// There are two independent AI chat DOM trees — the topbar floating panel
+// (bare ids: ai-chat-input/ai-chat-messages/ai-send-btn) and the sidebar
+// module view #view-ai-chat (suffixed -view ids). Both share sendAIMessage/
+// sendAIPrompt/addAIMessage/clearAIChat, so every DOM read/write in those
+// functions must go through here instead of a hardcoded bare id — otherwise
+// getElementById always resolves to whichever copy sits first in the DOM
+// (the topbar one) and the module view silently no-ops.
+// Priority: the topbar panel is a fixed-position overlay the user just
+// clicked open, so if it's open it wins even if the module view happens to
+// be the active nav view underneath it. Otherwise fall back to the module
+// view if that's the active page. Otherwise default to the topbar ids.
+function aiActiveSurface(){
+  if(typeof aiPanelOpen!=='undefined' && aiPanelOpen) return 'topbar';
+  if(document.getElementById('view-ai-chat')?.classList.contains('active')) return 'view';
+  return 'topbar';
+}
+function aiSurfaceEl(baseId, surface){
+  surface = surface || aiActiveSurface();
+  return document.getElementById(surface==='view' ? baseId+'-view' : baseId);
+}
+// Sets the header title + greeting bubble for ONE surface from companyInfo.nombre.
+// Each surface owns its own ids (ai-panel-title/ai-initial-greeting-topbar for the
+// topbar, ai-view-title/ai-initial-greeting-view for the module) — no cross-wire.
+function aiRenderGreeting(surface){
+  const name = companyInfo?.nombre || 'la empresa';
+  const titleEl = document.getElementById(surface==='view' ? 'ai-view-title' : 'ai-panel-title');
+  if(titleEl) titleEl.textContent = 'Asistente IA';
+  const greetEl = document.getElementById(surface==='view' ? 'ai-initial-greeting-view' : 'ai-initial-greeting-topbar');
+  if(greetEl){
+    const userName = state.currentUser?.displayName || state.currentUser?.email?.split('@')[0] || null;
+    greetEl.innerHTML = (userName ? '¡Hola, <strong>'+escHtml(userName)+'</strong>! ' : '¡Hola! ') +
+      'Tengo acceso a los datos de '+escHtml(name)+'. ¿En qué te ayudo?';
+  }
 }
 
-async function sendAIPrompt(msg){
+// ── SEND MESSAGE ─────────────────────────────────
+async function sendAIMessage(){
+  const surface = aiActiveSurface();
+  const input = aiSurfaceEl('ai-chat-input', surface);
+  const msg = input?.value.trim();
+  if(!msg) return;
+  input.value='';input.style.height='';
+  await sendAIPrompt(msg, surface);
+}
+
+async function sendAIPrompt(msg, surface){
+  surface = surface || aiActiveSurface();
   if(!GEMINI_API_KEY){
     if(state.currentUser?.role==='admin'){
-      addAIMessage('assistant','Para usar el asistente necesitas configurar la API key del equipo. <button onclick="promptGeminiKey()" class="btn-sm btn-blue" style="margin-top:6px"><i class="ti ti-key"></i> Configurar API key</button>');
+      addAIMessage('assistant','Para usar el asistente necesitas configurar la API key del equipo. <button onclick="promptGeminiKey()" class="btn-sm btn-blue" style="margin-top:6px"><i class="ti ti-key"></i> Configurar API key</button>', surface);
     } else {
-      addAIMessage('assistant','El administrador aún no ha configurado el asistente.');
+      addAIMessage('assistant','El administrador aún no ha configurado el asistente.', surface);
     }
     return;
   }
   // Add user message
-  addAIMessage('user', msg);
+  addAIMessage('user', msg, surface);
   aiRecentPrompts.unshift(msg);
   aiRecentPrompts = aiRecentPrompts.slice(0,5);
   updateAIRecentPrompts();
   // Show thinking
   const thinkId = 'ai-think-'+Date.now();
-  addAIMessage('assistant','<span id="'+thinkId+'"><i class="ti ti-loader" style="animation:spin .7s linear infinite"></i> Analizando datos...</span>');
-  const btn = document.getElementById('ai-send-btn');
+  addAIMessage('assistant','<span id="'+thinkId+'"><i class="ti ti-loader" style="animation:spin .7s linear infinite"></i> Analizando datos...</span>', surface);
+  const btn = aiSurfaceEl('ai-send-btn', surface);
   if(btn)btn.disabled=true;
 
   try {
@@ -11548,8 +11628,8 @@ async function sendAIPrompt(msg){
   if(btn)btn.disabled=false;
 }
 
-function addAIMessage(role, html){
-  const container = document.getElementById('ai-chat-messages');
+function addAIMessage(role, html, surface){
+  const container = aiSurfaceEl('ai-chat-messages', surface);
   if(!container)return;
   const isUser = role==='user';
   const div = document.createElement('div');
@@ -11571,9 +11651,9 @@ function formatAIResponse(text){
     .replace(/\n/g,'<br>');
 }
 
-function clearAIChat(){
+function clearAIChat(surface){
   aiChatHistory=[];
-  const container=document.getElementById('ai-chat-messages');
+  const container=aiSurfaceEl('ai-chat-messages', surface);
   if(container){
     container.innerHTML='<div style="display:flex;gap:8px;align-items:flex-start"><div style="width:24px;height:24px;border-radius:50%;background:var(--cp-purple);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-sparkles" style="color:white;font-size:11px"></i></div><div class="ai-bubble-content" style="background:white;border:1px solid var(--cp-gray-200);border-radius:0 var(--radius-md) var(--radius-md) var(--radius-md);padding:9px 12px;max-width:88%;font-size:12px;line-height:1.6">Chat limpiado. ¿En qué te ayudo?</div></div>';
   }
@@ -11585,27 +11665,60 @@ function updateAIRecentPrompts(){
   el.innerHTML=aiRecentPrompts.map(p=>'<div onclick="sendAIPrompt(\''+p.replace(/'/g,"\\'")+'\')" style="padding:6px 8px;cursor:pointer;border-radius:var(--radius-sm);color:var(--cp-gray-700);font-size:11px;border-bottom:1px solid var(--cp-gray-100)" onmouseover="this.style.background=\'var(--cp-gray-50)\'" onmouseout="this.style.background=\'\'"><i class="ti ti-arrow-forward" style="font-size:10px;color:var(--cp-gray-400);margin-right:4px"></i>'+p+'</div>').join('');
 }
 
-function renderAIContextPanel(){
-  const el=document.getElementById('ai-context-summary');
-  if(!el)return;
-  const hoy=new Date();hoy.setHours(0,0,0,0);
-  const overdueKb=kbData.cards.filter(c=>!c.done&&c.due&&new Date(c.due+'T12:00:00')<hoy).length;
-  const pendFact=cliData.reduce((s,c)=>{return s+(c.facturacion||[]).filter(f=>f.estadoPago==='pendiente').length;},0);
-  const items=[
-    {icon:'ti-users',label:'Colaboradores',val:state.employees.filter(e=>e.estado==='activo').length,color:'var(--cp-blue)'},
-    {icon:'ti-layout-kanban',label:'Tareas activas',val:kbData.cards.filter(c=>!c.done).length,color:'var(--cp-purple)',sub:overdueKb>0?overdueKb+' vencidas':null},
-    {icon:'ti-code',label:'Desarrollos activos',val:devData.filter(d=>!['cerrado'].includes(d.stage)).length,color:'var(--cp-amber)'},
-    {icon:'ti-building-store',label:'Clientes activos',val:cliData.filter(c=>c.status==='activo').length,color:'var(--cp-green)'},
-    {icon:'ti-file-invoice',label:'Facturas pendientes',val:pendFact,color:pendFact>0?'var(--cp-red)':'var(--cp-green)'},
-    {icon:'ti-speakerphone',label:'Campañas activas',val:mktData.filter(c=>c.stage==='activa').length,color:'var(--cp-pink,#EC4899)'},
-  ];
-  el.innerHTML=items.map(it=>'<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--cp-gray-100)">'+
+// Renders the "Datos disponibles" tile list for a set of {icon,label,val,color,sub} items.
+function _aiContextTiles(items){
+  return items.map(it=>'<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--cp-gray-100)">'+
     '<i class="ti '+it.icon+'" style="color:'+it.color+';font-size:14px;flex-shrink:0"></i>'+
     '<span style="flex:1;color:var(--cp-gray-600)">'+it.label+'</span>'+
     '<strong style="color:'+it.color+'">'+it.val+'</strong>'+
     (it.sub?'<span style="font-size:10px;color:var(--cp-red);margin-left:4px">'+it.sub+'</span>':'')+
-  '</div>').join('')+
-  '<div style="margin-top:10px;padding:8px;background:var(--cp-purple-light);border-radius:var(--radius-sm);font-size:11px;color:var(--cp-purple)"><i class="ti ti-info-circle"></i> Groq tiene acceso a todos estos datos en cada pregunta.</div>';
+  '</div>').join('');
+}
+// "Datos disponibles" panel — personal for every role (mirrors what
+// buildAppContext actually sends via getMisPendientesSync, same engine as
+// the notification bell/hub), plus an admin-only global diagnostic block.
+// Replaces the old org-wide counters that were shown to every role regardless
+// of what the AI's answers actually had access to for that user.
+function renderAIContextPanel(){
+  const el=document.getElementById('ai-context-summary');
+  if(!el)return;
+  const misPend = getMisPendientesSync(state.currentUser?.id);
+  const mine = misPend.filter(i=>i._isAsignado);
+  const misVencidas = mine.filter(misPendIsVencida).length;
+  const misHoyManana = mine.filter(i=>!misPendIsVencida(i)&&misPendIsHoyOManana(i)).length;
+  const misActivas = mine.length;
+  const mesActual = new Date().toISOString().slice(0,7);
+  const myEmpId = misPendMyEmpId();
+  const misCompletadasMes = myEmpId ? gpTareas.filter(t=>
+    t.estado==='completada' && t.fechaCompletada && String(t.fechaCompletada).slice(0,7)===mesActual &&
+    (t.asignados||[]).some(a=>a.id===myEmpId)
+  ).length : 0;
+
+  let html = _aiContextTiles([
+    {icon:'ti-list-check',label:'Mis tareas activas',val:misActivas,color:'var(--cp-blue)'},
+    {icon:'ti-alert-triangle',label:'Vencidas / atrasadas',val:misVencidas,color:misVencidas>0?'var(--cp-red)':'var(--cp-green)'},
+    {icon:'ti-calendar-due',label:'Para hoy y mañana',val:misHoyManana,color:misHoyManana>0?'var(--cp-amber)':'var(--cp-navy)'},
+    {icon:'ti-circle-check',label:'Completadas este mes',val:misCompletadasMes,color:'var(--cp-green)'},
+  ]);
+
+  if(state.currentUser?.role==='admin'){
+    const hoy=new Date();hoy.setHours(0,0,0,0);
+    const overdueKb=kbData.cards.filter(c=>!c.done&&c.due&&new Date(c.due+'T12:00:00')<hoy).length;
+    const pendFact=cliData.reduce((s,c)=>{return s+(c.facturacion||[]).filter(f=>f.estadoPago==='pendiente').length;},0);
+    html += '<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--cp-gray-100);font-size:11px;font-weight:600;color:var(--cp-gray-400);text-transform:uppercase">Diagnóstico del equipo (global)</div>' +
+      _aiContextTiles([
+        {icon:'ti-users',label:'Colaboradores activos',val:state.employees.filter(e=>e.estado==='activo').length,color:'var(--cp-blue)'},
+        {icon:'ti-layout-kanban',label:'Tareas Kanban activas',val:kbData.cards.filter(c=>!c.done).length,color:'var(--cp-purple)',sub:overdueKb>0?overdueKb+' vencidas':null},
+        {icon:'ti-file-invoice',label:'Facturas pendientes',val:pendFact,color:pendFact>0?'var(--cp-red)':'var(--cp-green)'},
+      ]);
+  }
+
+  const disclaimer = state.currentUser?.role==='admin'
+    ? 'El asistente tiene acceso al diagnóstico global del equipo.'
+    : 'El asistente analiza tu información personal.';
+  html += '<div style="margin-top:10px;padding:8px;background:var(--cp-purple-light);border-radius:var(--radius-sm);font-size:11px;color:var(--cp-purple)"><i class="ti ti-info-circle"></i> '+disclaimer+'</div>';
+
+  el.innerHTML = html;
 }
 
 // ═══════════════════════════════════════════════
@@ -12510,14 +12623,14 @@ async function getGeminiInsights() {
       resp.innerHTML='<span style="color:var(--cp-gray-400)">El administrador aún no ha configurado el asistente.</span>';
       return;
     }
-    const key = prompt('Ingresa la API key de Groq del equipo (console.groq.com):');
+    const key = prompt('Ingresa la API key del asistente IA del equipo:');
     if(!key) return;
     GEMINI_API_KEY = key.trim();
     saveAiKeyToSB(GEMINI_API_KEY);
   }
   if(btn) {btn.disabled=true;btn.innerHTML='<i class="ti ti-loader" style="animation:spin .7s linear infinite"></i> Analizando…';}
   section.style.display='block';
-  resp.innerHTML='<i class="ti ti-loader" style="animation:spin .7s linear infinite"></i> Groq está analizando los datos del equipo…';
+  resp.innerHTML='<i class="ti ti-loader" style="animation:spin .7s linear infinite"></i> El asistente está analizando los datos del equipo…';
 
   // Build context
   const hoy=new Date();hoy.setHours(0,0,0,0);
@@ -12557,7 +12670,7 @@ Responde con 3-4 bullets cortos y accionables. No más de 100 palabras total.`;
     const data = await res.json();
     if(data.error) throw new Error(data.error.message||JSON.stringify(data.error));
     const text = data.choices?.[0]?.message?.content || 'Sin respuesta.';
-    resp.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--cp-purple);margin-bottom:6px"><i class="ti ti-sparkles"></i> Análisis de Groq AI</div>' +
+    resp.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--cp-purple);margin-bottom:6px"><i class="ti ti-sparkles"></i> Análisis de IA</div>' +
       text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/^\* /gm,'• ');
   } catch(e) {
     resp.innerHTML='<span style="color:var(--cp-red)">Error: '+e.message+'. Verifica la API key.</span>';
@@ -13454,9 +13567,7 @@ function toggleAIPanel(){
   }
   if(aiPanelOpen && notifPanelOpen) toggleNotifPanel();
   if(aiPanelOpen){
-    const aiName=state.currentUser?.displayName||state.currentUser?.email?.split('@')[0]||'equipo';
-    const gr=document.getElementById('ai-initial-greeting');
-    if(gr)gr.innerHTML='¡Hola, <strong>'+aiName+'</strong>! Tengo acceso a todos los datos de Umbral. ¿En qué te ayudo?';
+    aiRenderGreeting('topbar');
     const apiKeyBtn=document.getElementById('ai-topbar-apikey-btn');
     if(apiKeyBtn)apiKeyBtn.style.display=(state.currentUser?.role==='admin')?'':'none';
     setTimeout(()=>{ document.getElementById('ai-chat-input')?.focus(); },100);
@@ -14473,7 +14584,7 @@ async function importBackup(file) {
     const backup = JSON.parse(text);
     
     if(!backup.tablas || !backup.version) {
-      toast('Archivo inválido — no es un backup de Umbral.', 'error');
+      toast('Archivo inválido — no es un backup de '+(companyInfo?.nombre||'la app')+'.', 'error');
       setBtn('restore-backup-btn', false);
       return;
     }
@@ -15934,6 +16045,7 @@ function renderSidebarNav(){
 // ── SIDEBAR / LOGIN BRANDING (per-client logo or text fallback) ──
 function renderSidebarBranding(){
   const name = companyInfo?.nombre || 'Umbral';
+  document.title = name;
   const logo = companyInfo?.logoDataUrl;
   const sbEl = document.getElementById('sidebar-brand-content');
   if(sbEl){
