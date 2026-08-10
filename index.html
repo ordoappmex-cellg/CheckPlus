@@ -1040,7 +1040,7 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
       </div>
     </div>
   </div>
-  <div class="login-right" style="display:flex;align-items:center;justify-content:center;padding:40px"><div style="max-width:320px;text-align:center"><div style="width:64px;height:64px;background:rgba(123,47,247,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><i class="ti ti-shield-lock" style="font-size:28px;color:#9B5FF8"></i></div><div style="font-size:20px;font-weight:700;color:var(--cp-navy);font-family:var(--font-display);margin-bottom:8px">Acceso seguro</div><div style="font-size:13px;color:var(--cp-gray-500);line-height:1.65;margin-bottom:20px">Autenticaci&oacute;n cifrada. Cada usuario accede solo a los m&oacute;dulos de su rol.</div><div style="display:flex;flex-direction:column;gap:8px;text-align:left"><div style="display:flex;gap:12px;align-items:center;padding:10px 14px;background:white;border-radius:var(--radius-md);border:1px solid var(--cp-gray-200)"><i class="ti ti-user-shield" style="color:#7B2FF7;font-size:16px;flex-shrink:0"></i><div><div style="font-size:12px;font-weight:600;color:var(--cp-navy)">Admin</div><div style="font-size:11px;color:var(--cp-gray-400)">Acceso completo + gesti&oacute;n de usuarios</div></div></div><div style="display:flex;gap:12px;align-items:center;padding:10px 14px;background:white;border-radius:var(--radius-md);border:1px solid var(--cp-gray-200)"><i class="ti ti-edit" style="color:#3B6BF5;font-size:16px;flex-shrink:0"></i><div><div style="font-size:12px;font-weight:600;color:var(--cp-navy)">Editor</div><div style="font-size:11px;color:var(--cp-gray-400)">Ve todo, edita sus m&oacute;dulos asignados</div></div></div><div style="display:flex;gap:12px;align-items:center;padding:10px 14px;background:white;border-radius:var(--radius-md);border:1px solid var(--cp-gray-200)"><i class="ti ti-eye" style="color:#10C080;font-size:16px;flex-shrink:0"></i><div><div style="font-size:12px;font-weight:600;color:var(--cp-navy)">Viewer</div><div style="font-size:11px;color:var(--cp-gray-400)">Solo lectura en m&oacute;dulos permitidos</div></div></div></div></div></div>
+  <div class="login-right" style="display:flex;align-items:center;justify-content:center;padding:40px"><div style="max-width:320px;text-align:center"><div style="width:64px;height:64px;background:rgba(123,47,247,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><i class="ti ti-shield-lock" style="font-size:28px;color:#9B5FF8"></i></div><div style="font-size:20px;font-weight:700;color:#F1E9FF;font-family:var(--font-display);margin-bottom:8px">Acceso seguro</div><div style="font-size:13px;color:rgba(255,255,255,.55);line-height:1.65;margin-bottom:20px">Autenticaci&oacute;n cifrada. Cada usuario accede solo a los m&oacute;dulos de su rol.</div><div style="display:flex;flex-direction:column;gap:8px;text-align:left"><div style="display:flex;gap:12px;align-items:center;padding:10px 14px;background:white;border-radius:var(--radius-md);border:1px solid var(--cp-gray-200)"><i class="ti ti-user-shield" style="color:#7B2FF7;font-size:16px;flex-shrink:0"></i><div><div style="font-size:12px;font-weight:600;color:var(--cp-navy)">Admin</div><div style="font-size:11px;color:var(--cp-gray-400)">Acceso completo + gesti&oacute;n de usuarios</div></div></div><div style="display:flex;gap:12px;align-items:center;padding:10px 14px;background:white;border-radius:var(--radius-md);border:1px solid var(--cp-gray-200)"><i class="ti ti-edit" style="color:#3B6BF5;font-size:16px;flex-shrink:0"></i><div><div style="font-size:12px;font-weight:600;color:var(--cp-navy)">Editor</div><div style="font-size:11px;color:var(--cp-gray-400)">Ve todo, edita sus m&oacute;dulos asignados</div></div></div><div style="display:flex;gap:12px;align-items:center;padding:10px 14px;background:white;border-radius:var(--radius-md);border:1px solid var(--cp-gray-200)"><i class="ti ti-eye" style="color:#10C080;font-size:16px;flex-shrink:0"></i><div><div style="font-size:12px;font-weight:600;color:var(--cp-navy)">Viewer</div><div style="font-size:11px;color:var(--cp-gray-400)">Solo lectura en m&oacute;dulos permitidos</div></div></div></div></div></div>
 </div>
 
 <!-- PASSWORD RECOVERY -->
@@ -4906,6 +4906,8 @@ window.hideCpSplash=function(){
   const trackCursor=isFinePointer&&!isMobile; // desktop-with-mouse only — mobile gets pure auto-drift, no tracking
   const COLORS=['#3B6BF5','#22D3EE','#9B5FF8']; // electric blue / cyan / purple — matches the brand accents already used elsewhere (--cp-blue, sidebar purple gradient)
   const LINK_DIST=130, MOUSE_DIST=170;
+  const MOUSE_MIN_DIST=42; // nodes this close to the cursor stop being pulled further — prevents collapsing onto a single point
+  const MOUSE_PULL=.004; // gentle lean toward the cursor, not a magnet (was .02 — that let dozens of nodes converge on the pointer)
   let w=0,h=0,dpr=Math.min(window.devicePixelRatio||1,2);
   let particles=[];
   const mouse={x:0,y:0,active:false};
@@ -4944,8 +4946,8 @@ window.hideCpSplash=function(){
       if(trackCursor&&mouse.active){
         const dx=mouse.x-p.x,dy=mouse.y-p.y;
         const dist=Math.hypot(dx,dy);
-        if(dist<MOUSE_DIST&&dist>.5){
-          const pull=(1-dist/MOUSE_DIST)*.02;
+        if(dist<MOUSE_DIST&&dist>MOUSE_MIN_DIST){
+          const pull=(1-dist/MOUSE_DIST)*MOUSE_PULL;
           p.x+=dx*pull;p.y+=dy*pull;
         }
       }
@@ -5030,7 +5032,7 @@ const SUPABASE_KEY='sb_publishable_7zCWzCHx4TqENab3K05zQg_qVwf3D7k';
 // All DB access goes through the authenticated user session (RLS enforced).
 // Single source of truth for the build version — feeds the discreet sidebar
 // version label (future feature); not shown in the window title anymore.
-const APP_VERSION='v66';
+const APP_VERSION='v67';
 // Shared client-side upload guard for every user-upload entry point (Storage
 // uploads and base64/FileReader reads alike) EXCEPT the company logo, which
 // keeps its own stricter, purpose-specific COMPANY_LOGO_MAX_BYTES check.
