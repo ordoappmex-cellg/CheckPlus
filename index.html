@@ -11,7 +11,6 @@
 <meta name="apple-mobile-web-app-title" content="Umbral">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="assets/icon.png">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -124,6 +123,7 @@ body{font-family:var(--font-body);background:var(--cp-bg);color:var(--cp-gray-80
 .nav-item.active .nav-badge{background:rgba(123,47,247,.3);color:#C07EFF;}
 .nav-disabled{opacity:.35;cursor:default!important;pointer-events:none;}
 .sidebar-footer{padding:14px 12px;border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;}
+.sidebar-version{flex-shrink:0;text-align:center;padding:6px 8px 10px;font-size:10px;color:rgba(255,255,255,.22);letter-spacing:.02em;}
 .logout-btn{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:var(--radius-sm);color:rgba(255,255,255,.35);cursor:pointer;transition:all .15s;font-size:13px;width:100%;background:none;border:none;font-family:var(--font-body);}
 .logout-btn:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.65);}
 .main-content{margin-left:240px;min-height:100vh;transition:margin-left .22s cubic-bezier(.4,0,.2,1);}
@@ -136,6 +136,7 @@ body{font-family:var(--font-body);background:var(--cp-bg);color:var(--cp-gray-80
 .sidebar.sb-icon .sb-group-header{justify-content:center;}
 .sidebar.sb-icon .nav-item{justify-content:center;padding:10px;gap:0;}
 .sidebar.sb-icon .nav-item-label,.sidebar.sb-icon .nav-badge{display:none;}
+.sidebar.sb-icon #sidebar-version-label{display:none;}
 .sidebar.sb-icon .nav-item i{font-size:18px;}
 .sidebar.sb-icon .sb-group-items.closed{max-height:9999px!important;opacity:1;pointer-events:auto;}
 /* Tooltip in icon mode */
@@ -1064,6 +1065,7 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
     </div>
     <!-- SIDEBAR NAV - dynamically rendered by renderSidebarNav() -->
     <div class="sidebar-nav-scroll" id="sidebar-nav-container"></div>
+    <div class="sidebar-version" id="sidebar-version-label"></div>
   </nav>
   <!-- Hamburger shown when sidebar fully hidden -->
   <button class="sb-hamburger" id="sb-hamburger" onclick="cycleSidebar()" title="Abrir menú">
@@ -2550,7 +2552,7 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
           </div>
         </div>
 
-        <div class="section-card" style="margin-bottom:18px">
+        <div class="section-card" id="cfg-menu-section" style="margin-bottom:18px">
           <div class="section-header">
             <div class="section-title"><i class="ti ti-layout-sidebar" style="margin-right:6px;color:var(--cp-purple)"></i>Configurar menú lateral</div>
             <button class="btn-sm btn-blue" onclick="saveNavConfig()"><i class="ti ti-check"></i> Guardar cambios</button>
@@ -4884,7 +4886,15 @@ const SUPABASE_KEY='sb_publishable_7zCWzCHx4TqENab3K05zQg_qVwf3D7k';
 // All DB access goes through the authenticated user session (RLS enforced).
 // Single source of truth for the build version — feeds the discreet sidebar
 // version label (future feature); not shown in the window title anymore.
-const APP_VERSION='v64';
+const APP_VERSION='v65';
+// Shared client-side upload guard for every user-upload entry point (Storage
+// uploads and base64/FileReader reads alike) EXCEPT the company logo, which
+// keeps its own stricter, purpose-specific COMPANY_LOGO_MAX_BYTES check.
+const MAX_UPLOAD_BYTES = 5*1024*1024; // 5MB
+function checkFileSize(file){
+  if(file && file.size>MAX_UPLOAD_BYTES){ toast('El archivo supera el límite de 5 MB.','error'); return false; }
+  return true;
+}
 let sb;
 try {
   // Supabase JS v2: createClient with persistSession:true automatically
@@ -5254,6 +5264,11 @@ async function dbLoad(){
     if(companyRow?.config) companyInfo={...companyInfo, ...companyRow.config};
     try{ localStorage.setItem('cp_company_info_cache', JSON.stringify(companyInfo)); }catch(e){}
     renderSidebarBranding();
+    const menuRow=(appCfgRaw||[]).find(r=>r.id==='menu_order');
+    if(menuRow?.config) menuOrderConfig=menuRow.config;
+    // Sidebar already rendered once (pre-dbLoad, from defaults) at login — refresh
+    // it now that the real global order is in memory, same pattern as branding above.
+    renderSidebarNav();
     // Run one-time migration from localStorage if needed
     await migrateLocalToSupabase();
   }catch(e){
@@ -6194,6 +6209,7 @@ function triggerPhotoUpload(){document.getElementById('photo-file-input').click(
 
 async function handlePhotoUpload(event){
   const file=event.target.files[0];if(!file)return;
+  if(!checkFileSize(file))return;
   const reader=new FileReader();
   reader.onload=async(e)=>{
     const base64=e.target.result;
@@ -6207,6 +6223,7 @@ async function handlePhotoUpload(event){
 
 function previewEmpPhoto(event){
   const file=event.target.files[0];if(!file)return;
+  if(!checkFileSize(file))return;
   const reader=new FileReader();
   reader.onload=e=>{const img=document.getElementById('emp-photo-preview');img.src=e.target.result;img.style.display='block';document.getElementById('emp-photo-zone').querySelector('i').style.display='none';document.getElementById('emp-photo-zone').querySelector('span').style.display='none';};
   reader.readAsDataURL(file);
@@ -6446,6 +6463,7 @@ async function deleteEmpDocFile(url){
 async function saveDoc(){
   const empId=state.currentEmpId;
   if(!_docFileData){toast('Selecciona un archivo para adjuntar.','error');return;}
+  if(!checkFileSize(_docFileData))return;
   setBtn('save-doc-btn',true);
   try{
     const uploaded=await uploadEmpDocFile(_docFileData,empId);
@@ -6874,6 +6892,7 @@ function openVacEdit(vacId, empId) {
 function handleVacDocSelect(event) {
   const file = event.target.files[0];
   if (!file) return;
+  if(!checkFileSize(file))return;
   const reader = new FileReader();
   reader.onload = (e) => {
     currentVacEdit.docBase64 = e.target.result;
@@ -7778,11 +7797,13 @@ function showCfgUsersSection(){
   const secK=document.getElementById('cfg-kanban-section');
   const secE=document.getElementById('cfg-eval-section');
   const secD=document.getElementById('cfg-dashboard-section');
+  const secM=document.getElementById('cfg-menu-section');
   if(sec)sec.style.display=isAdmin?'block':'none';
   if(secP)secP.style.display=isAdmin?'block':'none';
   if(secK)secK.style.display=isAdmin?'block':'none';
   if(secE)secE.style.display=isAdmin?'block':'none';
   if(secD)secD.style.display=isAdmin?'block':'none';
+  if(secM)secM.style.display=isAdmin?'block':'none';
   if(isAdmin){renderCfgProductosList();renderCfgKanbanMembers();loadModuleData('evaluaciones').then(renderCfgEvalSection);renderCfgDashSections();}
 }
 function showCfgProductosSection(){
@@ -8936,7 +8957,7 @@ function openEditFacturacion(fid){
   openModal('modal-facturacion');
 }
 
-function handleFactDocSelect(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=(ev)=>{factDocData={base64:ev.target.result,nombre:f.name};document.getElementById('ff-doc-label').textContent='✓ '+f.name;};r.readAsDataURL(f);}
+function handleFactDocSelect(e){const f=e.target.files[0];if(!f)return;if(!checkFileSize(f))return;const r=new FileReader();r.onload=(ev)=>{factDocData={base64:ev.target.result,nombre:f.name};document.getElementById('ff-doc-label').textContent='✓ '+f.name;};r.readAsDataURL(f);}
 
 function handleComprobanteSelect(e){
   const f=e.target.files[0]; if(!f)return;
@@ -9035,6 +9056,7 @@ async function saveFacturacion(){
   let comprobanteUrl=factComprobanteRemoved?null:(factComprobanteExisting?.url||null);
   let comprobanteNombre=factComprobanteRemoved?null:(factComprobanteExisting?.nombre||null);
   if(factComprobanteFile){
+    if(!checkFileSize(factComprobanteFile)){ setBtn('save-fact-btn',false); return; }
     try{
       const uploaded=await uploadComprobantePago(factComprobanteFile,currentCliId,periodo);
       comprobanteUrl=uploaded.url; comprobanteNombre=uploaded.nombre;
@@ -9279,6 +9301,7 @@ function selectCliColor(color, el) {
 
 function previewCliPhoto(event) {
   const file = event.target.files[0]; if(!file)return;
+  if(!checkFileSize(file))return;
   const reader = new FileReader();
   reader.onload = (e) => {
     cliPhotoData = e.target.result;
@@ -10457,7 +10480,7 @@ function toggleDevSubtask(devId,idx){
 // ── FILES ─────────────────────────────────────────
 function handleDevFileSelect(e){
   const files=Array.from(e.target.files);
-  files.forEach(f=>{const r=new FileReader();r.onload=(ev)=>{devFiles.push({nombre:f.name,base64:ev.target.result});renderDevFileList();};r.readAsDataURL(f);});
+  files.forEach(f=>{if(!checkFileSize(f))return;const r=new FileReader();r.onload=(ev)=>{devFiles.push({nombre:f.name,base64:ev.target.result});renderDevFileList();};r.readAsDataURL(f);});
   e.target.value='';
 }
 function renderDevFileList(){
@@ -13250,7 +13273,7 @@ function renderSpTagsList(){
 }
 
 // Files
-function handleSpFiles(e){const files=Array.from(e.target.files);files.forEach(f=>{const r=new FileReader();r.onload=(ev)=>{spFiles.push({nombre:f.name,base64:ev.target.result});renderSpFileList();};r.readAsDataURL(f);});e.target.value='';}
+function handleSpFiles(e){const files=Array.from(e.target.files);files.forEach(f=>{if(!checkFileSize(f))return;const r=new FileReader();r.onload=(ev)=>{spFiles.push({nombre:f.name,base64:ev.target.result});renderSpFileList();};r.readAsDataURL(f);});e.target.value='';}
 function renderSpFileList(){
   const el=document.getElementById('spf-file-list');if(!el)return;
   el.innerHTML=spFiles.map((f,i)=>'<div style="display:flex;align-items:center;gap:8px;padding:5px 9px;background:var(--cp-blue-light);border-radius:var(--radius-sm)"><i class="ti ti-file" style="color:var(--cp-blue)"></i><span style="flex:1;font-size:12px">'+escHtml(f.nombre)+'</span><button onclick="spFiles.splice('+i+',1);renderSpFileList()" style="background:none;border:none;color:var(--cp-red);cursor:pointer"><i class="ti ti-x"></i></button></div>').join('');
@@ -14224,6 +14247,7 @@ async function saveRepoDoc() {
 
   // Upload file to Supabase Storage if a file was selected
   if(repoDocFile?.file) {
+    if(!checkFileSize(repoDocFile.file)){ setBtn('save-repo-btn', false); return; }
     toast('Subiendo archivo...');
     const ext = repoDocFile.file.name.split('.').pop();
     const path = state.currentUser?.id + '/' + uid9() + '.' + ext;
@@ -15943,7 +15967,11 @@ async function migrateLocalToSupabase() {
 // ═══════════════════════════════════════════════
 // DYNAMIC SIDEBAR + NAV CONFIG SYSTEM
 // ═══════════════════════════════════════════════
-const NAV_STORAGE = 'cp_nav_config_v1';
+// Global, admin-defined menu order — app_config row id:'menu_order', shape
+// {groups:[...]}. Loaded in dbLoad()'s boot batch (same batch as company_info)
+// so it's ready before the first real sidebar render. null until dbLoad
+// resolves or if the row was never set (loadNavConfig falls back to defaults).
+let menuOrderConfig = null;
 
 // All available modules
 const ALL_MODULES = [
@@ -15979,9 +16007,9 @@ function navConfigDefaults(){
 }
 
 function loadNavConfig(){
-  let cfg;
-  try{const s=localStorage.getItem(NAV_STORAGE);cfg=s?JSON.parse(s):navConfigDefaults();}
-  catch(e){cfg=navConfigDefaults();}
+  let cfg = (menuOrderConfig && Array.isArray(menuOrderConfig.groups) && menuOrderConfig.groups.length)
+    ? JSON.parse(JSON.stringify(menuOrderConfig.groups)) // defensive copy — callers/mutators must not mutate the shared cache directly
+    : navConfigDefaults();
   // v1.8: "Mis Pendientes" es un módulo nuevo — se inyecta en configs de sidebar
   // ya guardadas (de antes de esta versión) para que quede visible a todos sin
   // que cada usuario tenga que re-agregarlo a mano desde Configuración.
@@ -15991,12 +16019,27 @@ function loadNavConfig(){
       g1.items=g1.items||[];
       const dashIdx=g1.items.indexOf('dashboard');
       g1.items.splice(dashIdx>=0?dashIdx+1:0,0,'mis-pendientes');
-      try{localStorage.setItem(NAV_STORAGE,JSON.stringify(cfg));}catch(e){}
+      // Persist the one-time migration globally only if this user can actually
+      // write menu_order — otherwise just heal it in-memory for this render so
+      // non-admins never get a silent "Acción no permitida" from guardAdmin.
+      if(state.currentUser?.role==='admin') saveMenuOrderConfig(cfg);
     }
   }
   return cfg;
 }
+// Global write helper for menu_order — mirrors persistCompanyInfo's app_config
+// upsert idiom. Updates the in-memory cache immediately (so callers can
+// re-render the sidebar/editor without waiting on the network), then persists
+// in the background.
+function saveMenuOrderConfig(groups){
+  menuOrderConfig = {groups};
+  sb.from('app_config').upsert({id:'menu_order',config:{groups},updated_at:new Date().toISOString()})
+    .then(({error})=>{
+      if(error){ console.error('menu_order upsert error:',error); toast('Error al guardar el orden del menú.','error'); }
+    });
+}
 function saveNavConfig(){
+  if(!guardAdmin('saveNavConfig')) return;
   // Read current editor state
   const groups=[];
   document.querySelectorAll('.nav-group-editor').forEach(g=>{
@@ -16006,7 +16049,7 @@ function saveNavConfig(){
     g.querySelectorAll('.nav-module-chip').forEach(chip=>{items.push(chip.dataset.moduleId);});
     groups.push({id,label,items});
   });
-  localStorage.setItem(NAV_STORAGE,JSON.stringify(groups));
+  saveMenuOrderConfig(groups);
   renderSidebarNav();
   toast('Menú actualizado ✓');
 }
@@ -16046,6 +16089,8 @@ function renderSidebarNav(){
 function renderSidebarBranding(){
   const name = companyInfo?.nombre || 'Umbral';
   document.title = name;
+  const verEl = document.getElementById('sidebar-version-label');
+  if(verEl) verEl.textContent = APP_VERSION;
   const logo = companyInfo?.logoDataUrl;
   const sbEl = document.getElementById('sidebar-brand-content');
   if(sbEl){
@@ -16215,13 +16260,14 @@ function navDragStart(e,modId,fromGroup){
 function navDropToGroup(e,groupId){
   e.preventDefault();
   if(!navDragModule)return;
+  if(!guardAdmin('navDropToGroup')){navDragModule=null;return;}
   const config=loadNavConfig();
   // Remove from old group
   config.forEach(g=>{g.items=(g.items||[]).filter(id=>id!==navDragModule);});
   // Add to new group
   const target=config.find(g=>g.id===groupId);
   if(target&&!target.items.includes(navDragModule))target.items.push(navDragModule);
-  localStorage.setItem(NAV_STORAGE,JSON.stringify(config));
+  saveMenuOrderConfig(config);
   renderNavConfigEditor();
   navDragModule=null;
 }
@@ -16229,23 +16275,26 @@ function navDropToGroup(e,groupId){
 function navDropToUnassigned(e){
   e.preventDefault();
   if(!navDragModule)return;
+  if(!guardAdmin('navDropToUnassigned')){navDragModule=null;return;}
   const config=loadNavConfig();
   config.forEach(g=>{g.items=(g.items||[]).filter(id=>id!==navDragModule);});
-  localStorage.setItem(NAV_STORAGE,JSON.stringify(config));
+  saveMenuOrderConfig(config);
   renderNavConfigEditor();
   navDragModule=null;
 }
 
 function removeModFromGroup(modId,groupId){
+  if(!guardAdmin('removeModFromGroup'))return;
   const config=loadNavConfig();
   const group=config.find(g=>g.id===groupId);
   if(group)group.items=group.items.filter(id=>id!==modId);
-  localStorage.setItem(NAV_STORAGE,JSON.stringify(config));
+  saveMenuOrderConfig(config);
   renderNavConfigEditor();
 }
 
 // ── Controles táctiles (sin depender de drag) ─────
 function navMoveModInGroup(modId,groupId,dir){
+  if(!guardAdmin('navMoveModInGroup'))return;
   const config=loadNavConfig();
   const group=config.find(g=>g.id===groupId);
   if(!group||!group.items)return;
@@ -16253,33 +16302,36 @@ function navMoveModInGroup(modId,groupId,dir){
   const newIdx=idx+dir;
   if(idx===-1||newIdx<0||newIdx>=group.items.length)return;
   [group.items[idx],group.items[newIdx]]=[group.items[newIdx],group.items[idx]];
-  localStorage.setItem(NAV_STORAGE,JSON.stringify(config));
+  saveMenuOrderConfig(config);
   renderNavConfigEditor();
 }
 function navAddModToGroup(modId){
+  if(!guardAdmin('navAddModToGroup'))return;
   const config=loadNavConfig();
   if(!config.length)return;
   const target=config[config.length-1];
   if(!target.items.includes(modId))target.items.push(modId);
-  localStorage.setItem(NAV_STORAGE,JSON.stringify(config));
+  saveMenuOrderConfig(config);
   renderNavConfigEditor();
 }
 
 function addNavGroup(){
+  if(!guardAdmin('addNavGroup'))return;
   const config=loadNavConfig();
   config.push({id:'g'+Date.now(),label:'Nuevo grupo',items:[]});
-  localStorage.setItem(NAV_STORAGE,JSON.stringify(config));
+  saveMenuOrderConfig(config);
   renderNavConfigEditor();
 }
 
 function removeNavGroup(groupId){
+  if(!guardAdmin('removeNavGroup'))return;
   const config=loadNavConfig();
   const group=config.find(g=>g.id===groupId);
   const items=group?.items||[];
   // Move items to first group
   const filtered=config.filter(g=>g.id!==groupId);
   if(filtered.length&&items.length)filtered[0].items=[...filtered[0].items,...items];
-  localStorage.setItem(NAV_STORAGE,JSON.stringify(filtered));
+  saveMenuOrderConfig(filtered);
   renderNavConfigEditor();
 }
 
@@ -16673,7 +16725,7 @@ function renderMktSubtasksList(){
     '<button onclick="mktSubtasks.splice('+i+',1);renderMktSubtasksList()" style="background:none;border:none;color:var(--cp-red);cursor:pointer"><i class="ti ti-x"></i></button>'+
   '</div>').join('')||'<div style="font-size:12px;color:var(--cp-gray-400);padding:6px 0">Sin subtareas</div>';
 }
-function handleMktFileSelect(e){const files=Array.from(e.target.files);files.forEach(f=>{const r=new FileReader();r.onload=(ev)=>{mktFiles.push({nombre:f.name,base64:ev.target.result});renderMktFileList();};r.readAsDataURL(f);});e.target.value='';}
+function handleMktFileSelect(e){const files=Array.from(e.target.files);files.forEach(f=>{if(!checkFileSize(f))return;const r=new FileReader();r.onload=(ev)=>{mktFiles.push({nombre:f.name,base64:ev.target.result});renderMktFileList();};r.readAsDataURL(f);});e.target.value='';}
 function renderMktFileList(){const el=document.getElementById('mktf-file-list');if(!el)return;el.innerHTML=mktFiles.map((f,i)=>'<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--cp-blue-light);border-radius:var(--radius-sm)"><i class="ti ti-file" style="color:var(--cp-blue)"></i><span style="font-size:12px;flex:1">'+f.nombre+'</span><button onclick="mktFiles.splice('+i+',1);renderMktFileList()" style="background:none;border:none;color:var(--cp-red);cursor:pointer"><i class="ti ti-x"></i></button></div>').join('');}
 
 function saveMktCampana(){
@@ -16844,6 +16896,7 @@ function mktPSubDrop(toIdx){
 function handleMktProyFileSelect(e){
   const files=e.target.files;if(!files||!files.length)return;
   Array.from(files).forEach(f=>{
+    if(!checkFileSize(f))return;
     const r=new FileReader();
     r.onload=(ev)=>{mktProyFiles.push({base64:ev.target.result,nombre:f.name});renderMktProyFileList();};
     r.readAsDataURL(f);
@@ -16900,7 +16953,7 @@ function renderMktRepositorio(){
 }
 
 function openAddMktDoc(){mktDocFile=null;['mktdocf-nombre'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('mktdocf-label').textContent='Arrastra o haz clic para subir';document.getElementById('mktdocf-ver').value='v1.0';openModal('modal-mkt-doc');}
-function handleMktDocSelect(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=(ev)=>{mktDocFile={base64:ev.target.result,nombre:f.name};document.getElementById('mktdocf-label').textContent='✓ '+f.name;if(!document.getElementById('mktdocf-nombre').value)document.getElementById('mktdocf-nombre').value=f.name;};r.readAsDataURL(f);}
+function handleMktDocSelect(e){const f=e.target.files[0];if(!f)return;if(!checkFileSize(f))return;const r=new FileReader();r.onload=(ev)=>{mktDocFile={base64:ev.target.result,nombre:f.name};document.getElementById('mktdocf-label').textContent='✓ '+f.name;if(!document.getElementById('mktdocf-nombre').value)document.getElementById('mktdocf-nombre').value=f.name;};r.readAsDataURL(f);}
 function saveMktDoc(){const nombre=document.getElementById('mktdocf-nombre').value.trim()||'Documento';setBtn('save-mktdoc-btn',true);mktDocData.push({id:uid9(),nombre,categoria:document.getElementById('mktdocf-cat').value,version:document.getElementById('mktdocf-ver').value||'v1.0',docBase64:mktDocFile?.base64||null,docNombre:mktDocFile?.nombre||null,fecha:new Date().toISOString().split('T')[0]});mktDocSave(mktDocData);closeModal('modal-mkt-doc');renderMktRepositorio();toast('Archivo subido ✓');setBtn('save-mktdoc-btn',false);}
 function deleteMktDoc(id){mktDocData=mktDocData.filter(x=>x.id!==id);mktDocSave(mktDocData);renderMktRepositorio();toast('Eliminado.','info');}
 
@@ -17602,6 +17655,7 @@ async function disenoUploadFiles(fileList,entityType){
   if(!entityId)return;
   const arr=entityType==='proyecto'?_dpfArchivos:_dtfArchivos;
   for(const file of fileList){
+    if(!checkFileSize(file))continue;
     try{
       const meta=await uploadDisenoFile(file,entityType,entityId);
       arr.push(meta);
@@ -18315,6 +18369,7 @@ function handleDisenoMaterialFileSelect(e){
   e.target.value='';
   (async()=>{
     for(const file of files){
+      if(!checkFileSize(file))continue;
       try{ await uploadMaterialFile(file,_disenoMatFolder); }
       catch(err){ toast('Error subiendo '+file.name+': '+(err.message||''),'error'); }
     }
@@ -20384,6 +20439,7 @@ async function direccionUploadFiles(fileList,entityType){
   if(!entityId)return;
   const arr=entityType==='proyecto'?dirpfArchivos:dirtfArchivos;
   for(const file of fileList){
+    if(!checkFileSize(file))continue;
     try{
       const meta=await uploadDireccionFile(file,entityType,entityId);
       arr.push(meta);
@@ -22046,6 +22102,7 @@ async function gpUploadFiles(fileList,entityType){
   if(!entityId)return;
   const arr=entityType==='proyecto'?gppfArchivos:gptfArchivos;
   for(const file of fileList){
+    if(!checkFileSize(file))continue;
     try{
       const meta=await uploadGpFile(file,entityType,entityId);
       arr.push(meta);
@@ -23270,6 +23327,7 @@ async function saveOrgTitulo(){
   let fotoUrl=existing?.fotoUrl||null;
   if(orgTituloRemoveLogo)fotoUrl=null;
   if(orgTituloLogoFile){
+    if(!checkFileSize(orgTituloLogoFile)){ setBtn('save-org-titulo-btn',false); return; }
     toast('Subiendo logo...');
     const ext=orgTituloLogoFile.name.split('.').pop();
     const path='organigrama/'+uid9()+'.'+ext;
@@ -23677,7 +23735,7 @@ function addKbSubtask(){const inp=document.getElementById('kbf-new-sub');const t
   inp.focus();renderKbChecklist();}
 function toggleKbSub(i){kbCardSubtasks[i].done=!kbCardSubtasks[i].done;renderKbChecklist();}
 function removeKbSub(i){kbCardSubtasks.splice(i,1);renderKbChecklist();}
-function handleKbDocSelect(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=(ev)=>{kbCardDoc={base64:ev.target.result,nombre:file.name};document.getElementById('kbf-doc-label').textContent='✓ '+file.name;};reader.readAsDataURL(file);}
+function handleKbDocSelect(e){const file=e.target.files[0];if(!file)return;if(!checkFileSize(file))return;const reader=new FileReader();reader.onload=(ev)=>{kbCardDoc={base64:ev.target.result,nombre:file.name};document.getElementById('kbf-doc-label').textContent='✓ '+file.name;};reader.readAsDataURL(file);}
 async function saveKbCard(){const titulo=document.getElementById('kbf-titulo').value.trim();if(!titulo){toast('El título es obligatorio.','error');return;}const card={
     id:kbEditCardId||uid8(),titulo,
     desc:document.getElementById('kbf-desc').value.trim(),
@@ -23930,6 +23988,7 @@ function deleteSegFile(sgId, fileIdx) {
 function handleSegDocSelect(event) {
   const files = Array.from(event.target.files);
   files.forEach(file => {
+    if(!checkFileSize(file))return;
     const reader = new FileReader();
     reader.onload = (e) => {
       segModalDocs.push({ nombre: file.name, base64: e.target.result });
