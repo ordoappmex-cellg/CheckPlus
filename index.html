@@ -60,6 +60,7 @@ body{font-family:var(--font-body);background:var(--cp-bg);color:var(--cp-gray-80
 .login-dots-bg{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.03) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;}
 .login-glow{position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(123,47,247,.22) 0%,rgba(200,60,180,.1) 40%,transparent 70%);top:-150px;left:-150px;pointer-events:none;}
 .login-glow2{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(200,60,180,.14) 0%,transparent 65%);bottom:-100px;right:100px;pointer-events:none;}
+.login-particles-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:block;}
 .login-left-brand{display:flex;align-items:center;gap:14px;margin-bottom:60px;}
 .login-left-brand img{max-height:90px;width:auto;object-fit:contain;filter:drop-shadow(0 0 20px rgba(123,47,247,.4));}
 .login-tagline{font-family:var(--font-display);font-weight:700;font-size:38px;line-height:1.2;color:white;margin-bottom:18px;}
@@ -1025,6 +1026,7 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
 <div id="login-screen">
   <div class="login-left">
     <div class="login-dots-bg"></div><div class="login-glow"></div><div class="login-glow2"></div>
+    <canvas class="login-particles-canvas" id="login-particles-canvas"></canvas>
     <div class="login-left-brand"><div id="login-brand-content"><img src="assets/logo.png" alt="Umbral"></div><div style="font-size:12px;color:rgba(255,255,255,.3);margin-top:8px;letter-spacing:.08em;text-transform:uppercase">Control interno</div></div>
     <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:0 40px">
       <div style="display:flex;flex-direction:column;gap:14px;width:100%;max-width:340px">
@@ -2563,6 +2565,10 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
           </div>
         </div>
         <div style="max-width:560px">
+          <div class="section-card" style="margin-bottom:18px">
+            <div class="section-header"><div class="section-title"><i class="ti ti-device-mobile-down" style="margin-right:7px;color:var(--cp-purple)"></i>Instalar aplicación</div></div>
+            <div class="section-body"><div id="cfg-install-app-wrap"></div></div>
+          </div>
           <div class="section-card">
             <div class="section-header"><div class="section-title"><i class="ti ti-shield-check" style="margin-right:7px;color:var(--cp-green)"></i>Seguridad de acceso</div></div>
             <div class="section-body">
@@ -2962,7 +2968,7 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
       <input type="hidden" id="dpf-id">
       <div class="form-grid">
         <div class="form-field full"><label class="form-label">Título *</label><input class="form-input" id="dpf-titulo" placeholder="Ej. Rediseño landing page"></div>
-        <div class="form-field full"><label class="form-label">Descripción</label><textarea class="form-input" id="dpf-desc" rows="3" style="resize:none"></textarea></div>
+        <div class="form-field full"><label class="form-label">Descripción</label><textarea class="form-input" id="dpf-desc" rows="3"></textarea></div>
         <div class="form-field full"><label class="form-label">Cliente</label><select class="form-input" id="dpf-cliente"><option value="">— Sin cliente —</option></select></div>
         <div class="form-field"><label class="form-label">Solicitante (¿quién hizo la solicitud?)</label>
           <select class="form-input" id="dpf-solicitante" onchange="toggleDisenoSolicitanteLibre()"><option value="">— Sin asignar —</option></select>
@@ -3019,7 +3025,7 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
       <input type="hidden" id="dtf-proyecto-id">
       <div class="form-grid">
         <div class="form-field full"><label class="form-label">Título *</label><input class="form-input" id="dtf-titulo" placeholder="Ej. Exportar assets finales"></div>
-        <div class="form-field full"><label class="form-label">Descripción</label><textarea class="form-input" id="dtf-desc" rows="2" style="resize:none"></textarea></div>
+        <div class="form-field full"><label class="form-label">Descripción</label><textarea class="form-input" id="dtf-desc" rows="2"></textarea></div>
         <div class="form-field"><label class="form-label">Asignado a</label><select class="form-input" id="dtf-asignado"><option value="">Libre</option></select></div>
         <div class="form-field"><label class="form-label">Estado</label>
           <select class="form-input" id="dtf-estado">
@@ -3078,7 +3084,7 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
       <input type="hidden" id="dirpf-id">
       <div class="form-grid">
         <div class="form-field full"><label class="form-label">Título *</label><input class="form-input" id="dirpf-titulo" placeholder="Ej. Expansión regional"></div>
-        <div class="form-field full"><label class="form-label">Descripción</label><textarea class="form-input" id="dirpf-desc" rows="3" style="resize:none"></textarea></div>
+        <div class="form-field full"><label class="form-label">Descripción</label><textarea class="form-input" id="dirpf-desc" rows="3"></textarea></div>
         <div class="form-field"><label class="form-label">Área</label><select class="form-input" id="dirpf-area"></select></div>
         <div class="form-field"><label class="form-label">Prioridad</label>
           <select class="form-input" id="dirpf-prio">
@@ -3143,7 +3149,7 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
       <input type="hidden" id="dirtf-proyecto-id">
       <div class="form-grid">
         <div class="form-field full"><label class="form-label">Título *</label><input class="form-input" id="dirtf-titulo" placeholder="Ej. Preparar propuesta comercial"></div>
-        <div class="form-field full"><label class="form-label">Descripción</label><textarea class="form-input" id="dirtf-desc" rows="2" style="resize:none"></textarea></div>
+        <div class="form-field full"><label class="form-label">Descripción</label><textarea class="form-input" id="dirtf-desc" rows="2"></textarea></div>
         <div class="form-field full"><label class="form-label">Hito (opcional)</label><select class="form-input" id="dirtf-hito"><option value="">— Sin ligar a un hito —</option></select></div>
         <div class="form-field"><label class="form-label">Asignado a</label><select class="form-input" id="dirtf-asignado"><option value="">Libre</option></select></div>
         <div class="form-field"><label class="form-label">Estado</label>
@@ -3223,7 +3229,7 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
       <input type="hidden" id="gppf-id">
       <div class="form-grid">
         <div class="form-field full"><label class="form-label">Título *</label><input class="form-input" id="gppf-titulo" placeholder="Ej. Migración de CRM"></div>
-        <div class="form-field full"><label class="form-label">Descripción</label><textarea class="form-input" id="gppf-desc" rows="3" style="resize:none"></textarea></div>
+        <div class="form-field full"><label class="form-label">Descripción</label><textarea class="form-input" id="gppf-desc" rows="3"></textarea></div>
         <div class="form-field"><label class="form-label">Área</label><select class="form-input" id="gppf-area"></select></div>
         <div class="form-field"><label class="form-label">Tipo de tarea</label><select class="form-input" id="gppf-tipo-tarea"></select></div>
         <div class="form-field"><label class="form-label">Prioridad</label>
@@ -3285,7 +3291,7 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
       <input type="hidden" id="gptf-proyecto-id">
       <div class="form-grid">
         <div class="form-field full"><label class="form-label">Título *</label><input class="form-input" id="gptf-titulo" placeholder="Ej. Preparar propuesta"></div>
-        <div class="form-field full"><label class="form-label">Descripción</label><textarea class="form-input" id="gptf-desc" rows="2" style="resize:none"></textarea></div>
+        <div class="form-field full"><label class="form-label">Descripción</label><textarea class="form-input" id="gptf-desc" rows="2"></textarea></div>
         <div class="form-field full">
           <label class="form-label">Asignado a</label>
           <div style="display:flex;gap:8px;margin-bottom:8px">
@@ -3545,6 +3551,15 @@ body.direccion-presenting #direccion-rm-scroll{zoom:1.2;}
 
 
 
+
+<!-- GENERIC INFO MODAL (reusable — populate via showInfoModal(title, bodyHtml)) -->
+<div class="modal-overlay" id="modal-info">
+  <div class="modal" style="width:440px">
+    <div class="modal-header"><div class="modal-title" id="modal-info-title">Información</div><button class="modal-close" onclick="closeModal('modal-info')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body"><div id="modal-info-body" style="font-size:13px;color:var(--cp-gray-700);line-height:1.6"></div></div>
+    <div class="modal-footer"><button class="btn-sm btn-blue" onclick="closeModal('modal-info')">Cerrar</button></div>
+  </div>
+</div>
 
 <!-- DAY DETAIL MODAL (calendar expand) -->
 <div class="modal-overlay" id="modal-day-detail">
@@ -4877,6 +4892,135 @@ window.hideCpSplash=function(){
   setTimeout(()=>{el.style.display='none';},420);
 };
 
+// ── Login background: interactive node/constellation network ─────
+// Self-contained — reads/writes only its own canvas + mouse state, touches
+// nothing else in the app. Self-pauses via a cheap visibility poll instead of
+// hooking into doLogin/doLogout, so it needs no changes to the auth flow.
+(function(){
+  const canvas=document.getElementById('login-particles-canvas');
+  if(!canvas||!canvas.getContext)return;
+  const ctx=canvas.getContext('2d');
+  const prefersReduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isFinePointer=window.matchMedia&&window.matchMedia('(pointer:fine)').matches;
+  const isMobile=window.matchMedia&&window.matchMedia('(max-width:768px)').matches;
+  const trackCursor=isFinePointer&&!isMobile; // desktop-with-mouse only — mobile gets pure auto-drift, no tracking
+  const COLORS=['#3B6BF5','#22D3EE','#9B5FF8']; // electric blue / cyan / purple — matches the brand accents already used elsewhere (--cp-blue, sidebar purple gradient)
+  const LINK_DIST=130, MOUSE_DIST=170;
+  let w=0,h=0,dpr=Math.min(window.devicePixelRatio||1,2);
+  let particles=[];
+  const mouse={x:0,y:0,active:false};
+  let rafId=null,running=false;
+
+  function resize(){
+    const parent=canvas.parentElement;
+    w=parent.clientWidth;h=parent.clientHeight;
+    canvas.width=Math.max(1,Math.round(w*dpr));canvas.height=Math.max(1,Math.round(h*dpr));
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    const targetCount=Math.round((w*h)/(isMobile?24000:14000));
+    const count=Math.max(16,Math.min(targetCount,80));
+    particles=[];
+    for(let i=0;i<count;i++){
+      particles.push({
+        x:Math.random()*w,y:Math.random()*h,
+        vx:(Math.random()-.5)*.22,vy:(Math.random()-.5)*.22,
+        r:1+Math.random()*1.5,
+        color:COLORS[i%COLORS.length]
+      });
+    }
+  }
+
+  function step(){
+    // Self-pause once the login screen is no longer shown (after a successful
+    // login) instead of running an invisible rAF loop for the rest of the
+    // session — re-armed by the watchdog below when it becomes visible again.
+    const loginScreen=document.getElementById('login-screen');
+    if(!loginScreen||loginScreen.style.display==='none'){running=false;rafId=null;return;}
+
+    ctx.clearRect(0,0,w,h);
+    for(const p of particles){
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>w)p.vx*=-1;
+      if(p.y<0||p.y>h)p.vy*=-1;
+      if(trackCursor&&mouse.active){
+        const dx=mouse.x-p.x,dy=mouse.y-p.y;
+        const dist=Math.hypot(dx,dy);
+        if(dist<MOUSE_DIST&&dist>.5){
+          const pull=(1-dist/MOUSE_DIST)*.02;
+          p.x+=dx*pull;p.y+=dy*pull;
+        }
+      }
+    }
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const a=particles[i],b=particles[j];
+        const dist=Math.hypot(a.x-b.x,a.y-b.y);
+        if(dist<LINK_DIST){
+          ctx.strokeStyle='rgba(155,95,248,'+((1-dist/LINK_DIST)*.35)+')';
+          ctx.lineWidth=1;
+          ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+        }
+      }
+      if(trackCursor&&mouse.active){
+        const dist=Math.hypot(particles[i].x-mouse.x,particles[i].y-mouse.y);
+        if(dist<MOUSE_DIST){
+          ctx.strokeStyle='rgba(34,211,238,'+((1-dist/MOUSE_DIST)*.55)+')';
+          ctx.lineWidth=1;
+          ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(mouse.x,mouse.y);ctx.stroke();
+        }
+      }
+    }
+    for(const p of particles){
+      let glow=1;
+      if(trackCursor&&mouse.active){
+        const dist=Math.hypot(mouse.x-p.x,mouse.y-p.y);
+        if(dist<MOUSE_DIST)glow=1+(1-dist/MOUSE_DIST)*1.8;
+      }
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r*glow,0,Math.PI*2);
+      ctx.fillStyle=p.color;
+      ctx.globalAlpha=.85;
+      ctx.fill();
+      ctx.globalAlpha=1;
+    }
+    rafId=requestAnimationFrame(step);
+  }
+
+  function start(){
+    if(running)return;
+    running=true;
+    resize();
+    rafId=requestAnimationFrame(step);
+  }
+  function stop(){
+    running=false;
+    if(rafId)cancelAnimationFrame(rafId);
+    rafId=null;
+  }
+
+  if(trackCursor){
+    const container=canvas.parentElement;
+    container.addEventListener('mousemove',function(e){
+      const rect=container.getBoundingClientRect();
+      mouse.x=e.clientX-rect.left;mouse.y=e.clientY-rect.top;mouse.active=true;
+    });
+    container.addEventListener('mouseleave',function(){mouse.active=false;});
+  }
+  window.addEventListener('resize',function(){if(running)resize();});
+
+  if(!prefersReduced){
+    // Cheap visibility watchdog (no MutationObserver, no hooks into
+    // doLogin/doLogout/doSetNewPassword) — just checks once a second whether
+    // the login screen is currently shown and starts/stops accordingly.
+    setInterval(function(){
+      const loginScreen=document.getElementById('login-screen');
+      const visible=!!loginScreen&&loginScreen.style.display!=='none';
+      if(visible&&!running)start();
+      else if(!visible&&running)stop();
+    },1000);
+    start();
+  }
+})();
+
 // ═══════════════════════════════
 // CONFIG
 // ═══════════════════════════════
@@ -4886,7 +5030,7 @@ const SUPABASE_KEY='sb_publishable_7zCWzCHx4TqENab3K05zQg_qVwf3D7k';
 // All DB access goes through the authenticated user session (RLS enforced).
 // Single source of truth for the build version — feeds the discreet sidebar
 // version label (future feature); not shown in the window title anymore.
-const APP_VERSION='v65';
+const APP_VERSION='v66';
 // Shared client-side upload guard for every user-upload entry point (Storage
 // uploads and base64/FileReader reads alike) EXCEPT the company logo, which
 // keeps its own stricter, purpose-specific COMPANY_LOGO_MAX_BYTES check.
@@ -5318,6 +5462,15 @@ function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
 
+// Generic reusable "show me some info" modal — any feature that just needs to
+// display a title + a block of text/HTML can call this instead of building
+// its own single-purpose modal.
+function showInfoModal(title,bodyHtml){
+  const t=document.getElementById('modal-info-title'); if(t)t.textContent=title;
+  const b=document.getElementById('modal-info-body'); if(b)b.innerHTML=bodyHtml;
+  openModal('modal-info');
+}
+
 // ═══════════════════════════════
 // HELPERS
 // ═══════════════════════════════
@@ -5361,7 +5514,7 @@ async function nav(view){
     n.classList.toggle('active', n.dataset.view===view);
   });
   // Show nav config editor when entering configuracion
-  if(view==='configuracion'){setTimeout(renderNavConfigEditor,50);showCfgUsersSection();if(state.currentUser?.role==='admin')setTimeout(renderUsersList,100);setTimeout(renderConfigStatus,0);}
+  if(view==='configuracion'){setTimeout(renderNavConfigEditor,50);showCfgUsersSection();if(state.currentUser?.role==='admin')setTimeout(renderUsersList,100);setTimeout(renderConfigStatus,0);renderCfgInstallApp();}
   if(view==='empleados')renderEmpTable();
   if(view==='vacaciones')renderVacaciones();
   if(view==='permisos')renderPermisos();
@@ -5369,7 +5522,7 @@ async function nav(view){
   if(view==='nomina')renderNomina();
   if(view==='dashboard')renderDashboard();
   if(view==='mis-pendientes'){document.getElementById('page-title').textContent='Mis Pendientes';renderMisPendientes();}
-  if(view==='configuracion'){setTimeout(renderNavConfigEditor,50);showCfgUsersSection();if(state.currentUser?.role==='admin')setTimeout(renderUsersList,100);}
+  if(view==='configuracion'){setTimeout(renderNavConfigEditor,50);showCfgUsersSection();if(state.currentUser?.role==='admin')setTimeout(renderUsersList,100);renderCfgInstallApp();}
   if(view==='kanban'){
     document.getElementById('page-title').textContent='Tableros Kanban';
     if(!_moduleLoaded['kanban'])showModuleSkeleton('kb-board');
@@ -5566,6 +5719,19 @@ function closeDashEfemeride(){
   if(wrap)wrap.innerHTML='';
 }
 // Built entirely with DOM APIs (no innerHTML/template literals) per spec.
+// Click-to-expand full text — both the Dashboard box and the GP banner are
+// CSS-ellipsis-truncated for the inline display, but the full strings are
+// already sitting in memory (_dashBoxContent / _gpEfemerideContent), so this
+// just reads them straight into the shared #modal-info, no re-fetch needed.
+function showEfemerideFullModal(efemerideItem,curiosoText){
+  const efemerideTxt=efemerideItem?('Un día como hoy en '+efemerideItem.year+': '+efemerideItem.text):'Sin efemérides disponibles hoy.';
+  const body=
+    '<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;color:var(--cp-purple);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px"><i class="ti ti-calendar-event"></i> Efeméride</div>'+
+    '<div>'+escHtml(efemerideTxt)+'</div></div>'+
+    '<div><div style="font-size:11px;font-weight:700;color:var(--cp-purple);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px"><i class="ti ti-bulb"></i> Dato curioso</div>'+
+    '<div>'+escHtml(curiosoText||'Sin dato disponible.')+'</div></div>';
+  showInfoModal('Un día como hoy',body);
+}
 function _dashPaintEfemerideBox(){
   const wrap=document.getElementById('dash-efemeride-wrap');
   if(!wrap)return;
@@ -5598,7 +5764,9 @@ function _dashPaintEfemerideBox(){
   contentRow.appendChild(icon);
 
   const textEl=document.createElement('div');
-  textEl.style.cssText='flex:1;min-width:0;font-size:14px;color:var(--cp-gray-800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+  textEl.style.cssText='flex:1;min-width:0;font-size:14px;color:var(--cp-gray-800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer';
+  textEl.title='Ver texto completo';
+  textEl.addEventListener('click',function(){showEfemerideFullModal(_dashBoxContent.efemeride,_dashBoxContent.curioso);});
   if(_dashBoxTab==='curioso'){
     textEl.style.textAlign='center';
     textEl.textContent=_dashBoxContent.curioso||'';
@@ -5669,7 +5837,7 @@ function _gpPaintEfemerideBanner(){
   const item=_gpEfemerideContent.efemeride;
   const efemerideTxt=item?('Un día como hoy en '+item.year+': '+item.text):'Sin efemérides disponibles hoy.';
   const curiosoTxt=_gpEfemerideContent.curioso||'';
-  wrap.innerHTML='<div class="section-card" id="gp-efemeride-banner" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 24px;padding:10px 16px;margin-bottom:14px;background:var(--cp-gray-50);border:1px solid var(--cp-gray-100)">'+
+  wrap.innerHTML='<div class="section-card" id="gp-efemeride-banner" onclick="showEfemerideFullModal(_gpEfemerideContent.efemeride,_gpEfemerideContent.curioso)" title="Ver texto completo" style="cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;gap:6px 24px;padding:10px 16px;margin-bottom:14px;background:var(--cp-gray-50);border:1px solid var(--cp-gray-100)">'+
     '<div style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--cp-gray-700);flex:1;min-width:220px;overflow:hidden">'+
       '<span style="flex-shrink:0">📅</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b style="color:var(--cp-navy);font-weight:600">Efeméride:</b> '+escHtml(efemerideTxt)+'</span>'+
     '</div>'+
@@ -7181,7 +7349,50 @@ window.addEventListener('appinstalled', () => {
   document.getElementById('pwa-install-btn')?.remove();
   _pwaInstallPrompt = null;
   toast((companyInfo?.nombre||'La app')+' instalada como app ✓');
+  renderCfgInstallApp();
 });
+
+// ── PERMANENT INSTALL AFFORDANCE (Configuración) ──
+// The topbar button above only exists if/while beforeinstallprompt fired this
+// session — after an uninstall the browser may never re-fire it, leaving no
+// way back in. This card is always in the DOM (all roles, Configuración is
+// always:true) and degrades gracefully: reuses _pwaInstallPrompt when we have
+// it, otherwise falls back to manual instructions via the generic info modal.
+function isAppStandalone(){
+  return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone===true;
+}
+function renderCfgInstallApp(){
+  const el=document.getElementById('cfg-install-app-wrap');
+  if(!el)return;
+  const name=companyInfo?.nombre||'la aplicación';
+  if(isAppStandalone()){
+    el.innerHTML='<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--cp-green-light);border-left:3px solid var(--cp-green);border-radius:var(--radius-sm);font-size:13px;color:#005c3a"><i class="ti ti-circle-check" style="font-size:16px"></i>'+escHtml(name)+' ya está instalada ✓</div>';
+    return;
+  }
+  el.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">'+
+    '<div><div style="font-size:13px;font-weight:600;color:var(--cp-navy);margin-bottom:3px">Instalar '+escHtml(name)+' como app</div>'+
+    '<div style="font-size:12px;color:var(--cp-gray-500)">Accede más rápido desde tu escritorio o pantalla de inicio, sin abrir el navegador.</div></div>'+
+    '<button class="btn-sm btn-ghost" onclick="installAppClick()" style="border-color:var(--cp-purple);color:var(--cp-purple);flex-shrink:0"><i class="ti ti-device-mobile-down"></i> Instalar aplicación</button>'+
+  '</div>';
+}
+async function installAppClick(){
+  const name=companyInfo?.nombre||'la aplicación';
+  if(_pwaInstallPrompt){
+    _pwaInstallPrompt.prompt();
+    const { outcome } = await _pwaInstallPrompt.userChoice;
+    if(outcome==='accepted'){
+      toast(name+' instalada ✓');
+      document.getElementById('pwa-install-btn')?.remove();
+    }
+    _pwaInstallPrompt=null;
+    renderCfgInstallApp();
+    return;
+  }
+  showInfoModal('Instalar '+name,
+    '<p style="margin-bottom:10px">Tu navegador no ofreció la instalación automática en este momento (puede ser porque ya se descartó antes, o porque el navegador no la soporta). Puedes instalarla manualmente:</p>'+
+    '<p style="margin-bottom:6px"><strong>En computadora:</strong> usa el menú del navegador (⋮) → "Instalar aplicación".</p>'+
+    '<p><strong>En móvil:</strong> usa el menú de compartir/opciones → "Agregar a pantalla de inicio".</p>');
+}
 
 // ── SUPABASE REALTIME ────────────────────────────
 // Subscribes to key tables so changes from other users update the UI live
